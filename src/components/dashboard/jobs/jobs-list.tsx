@@ -18,6 +18,7 @@ import { CaretRight as CaretRightIcon } from '@phosphor-icons/react/dist/ssr/Car
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 // import Airtable from 'airtable';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Button } from '@mui/material';
 
 import { config } from '@/config';
 import { UserContext } from '@/contexts/auth/user-context';
@@ -25,6 +26,9 @@ import { MultiSelect } from '@/components/core/multi-select';
 import { toast } from '@/components/core/toaster';
 import { JobCard } from '@/components/dashboard/jobs/job-card';
 import type { Job } from '@/components/dashboard/jobs/job-card';
+import Airtable from 'airtable';
+
+type JobCategory = 'Internship' | 'Full-time';
 
 interface ApiResponse {
   jobs: Job[];
@@ -161,9 +165,9 @@ function JobsFilters({ onFilterChange }: JobsFiltersProps): React.JSX.Element {
   );
 }
 
-// const base = new Airtable({
-//   apiKey: config.airtable.apiKey,
-// }).base(config.airtable.baseId || '');
+const base = new Airtable({
+  apiKey: config.airtable.apiKey,
+}).base(config.airtable.baseId || '');
 
 export function JobsList(): React.JSX.Element {
   const theme = useTheme();
@@ -172,15 +176,14 @@ export function JobsList(): React.JSX.Element {
   if (!userContext) {
     throw new Error('UserContext is not available. Make sure the component is wrapped in a UserProvider.');
   }
-  // const { user } = userContext;
+  const { user } = userContext;
 
   const [jobs, setJobs] = React.useState<Job[]>([]);
   const [page, setPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
   const [hasNextPage, setHasNextPage] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  // const [candidateType, setCandidateType] = React.useState<string | null>(null);
-  // const [userEmail, setUserEmail] = React.useState<string>('');
+  const [selectedCategory, setSelectedCategory] = React.useState<JobCategory>();
   const [filters, setFilters] = React.useState({
     keyword: '',
     workTypes: [] as string[],
@@ -192,53 +195,55 @@ export function JobsList(): React.JSX.Element {
     throw new Error('Supabase URL or roleKey is not defined.');
   }
 
-  // // Check for saved email on component mount
-  // React.useEffect(() => {
-  //   if (user?.email) {
-  //     void checkUserType(user?.email);
-  //   }
-  // }, [user]);
+  // Check user's preferred job category on component mount
+  React.useEffect(() => {
+    if (user?.email) {
+      void checkUserPreferredCategory(user.email);
+    }
+  }, [user]);
 
-  // const checkUserType = async (email: string) => {
-  //   try {
-  //     const userTypeRecords = await base('SFF Candidate Database')
-  //       .select({
-  //         view: 'All Applications',
-  //         filterByFormula: `{Email} = '${email}'`,
-  //         fields: ['Canidate Type'],
-  //       })
-  //       .all();
+  const checkUserPreferredCategory = async (email: string) => {
+    try {
+      const existing = await base('Internship')
+        .select({
+          filterByFormula: `{Email} = '${email}'`,
+          maxRecords: 1,
+        })
+        .firstPage();
 
-  //     if (!userTypeRecords || userTypeRecords.length === 0) {
-  //       setCandidateType('Not Found');
-  //       setUserEmail('');
-  //     } else {
-  //       const userCandidateType = userTypeRecords[0].get('Canidate Type') as string;
-  //       setCandidateType(userCandidateType);
-  //       setUserEmail(email);
-  //       // Save email to localStorage
-  //       localStorage.setItem('userEmail', email);
-  //     }
-  //   } catch (err) {
-  //     toast.error('Error checking user type. Please try again.');
-  //   }
-  // };
+      if (existing.length > 0) {
+        setSelectedCategory("Internship");
+        console.log(existing, 'Internship');
+      } else {
+        const existing = await base('FT')
+          .select({
+            filterByFormula: `{Email} = '${user?.email}'`,
+            maxRecords: 1,
+          })
+          .firstPage();
+        if (existing.length > 0) {
+          setSelectedCategory("Full-time");
+          console.log(existing, 'FT');
+        }
+      }
+    } catch (err) {
+      toast.error('Error fetching user preferences. Defaulting to internships.');
+    }
+  };
 
   const fetchJobs = React.useCallback(async () => {
-    // if (!candidateType) return;
-
     try {
       setIsLoading(true);
       const queryParams = new URLSearchParams({
         page: page.toString(),
+        category: selectedCategory,
         ...(filters.keyword && { keyword: filters.keyword }),
         ...(filters.workTypes.length > 0 && { workTypes: filters.workTypes.join(',') }),
         ...(filters.paymentTypes.length > 0 && { paymentTypes: filters.paymentTypes.join(',') }),
         ...(filters.jobTypes.length > 0 && { jobTypes: filters.jobTypes.join(',') }),
-        // user: userEmail,
       });
 
-      const response = await fetch(`http://localhost:3005/api/jobs/jobs?${queryParams.toString()}`);
+      const response = await fetch(`http://135.181.215.55:3005/api/jobs/jobs?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -252,7 +257,7 @@ export function JobsList(): React.JSX.Element {
     } finally {
       setIsLoading(false);
     }
-  }, [page, filters]);
+  }, [page, filters, selectedCategory]);
 
   React.useEffect(() => {
     void fetchJobs();
@@ -266,6 +271,11 @@ export function JobsList(): React.JSX.Element {
   }) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
     setPage(1); // Reset to first page when filters change
+  };
+
+  const handleCategoryChange = (category: JobCategory) => {
+    setSelectedCategory(category);
+    setPage(1); // Reset to first page when category changes
   };
 
   const handleNextPage = () => {
@@ -290,10 +300,9 @@ export function JobsList(): React.JSX.Element {
       }}
     >
       <Stack spacing={4}>
-        {/* {candidateType !== 'Not Found' ? ( */}
         <Box
           sx={{
-            bgcolor: '#082439',
+            bgcolor: '#3B82F6',
             borderRadius: 1,
             color: 'var(--mui-palette-common-white)',
             px: 4,
@@ -310,9 +319,6 @@ export function JobsList(): React.JSX.Element {
               <Stack spacing={3}>
                 <Stack spacing={2}>
                   <Typography color="inherit" variant={isMobile ? 'h5' : 'h4'}>
-                    {/* {candidateType === 'Experienced Professional'
-                        ? 'Experienced Professionals and MBAs'
-                        : 'Undergraduates and Recent Graduates'} */}
                     Gain Experience in Search Funds and Small Business M&A
                   </Typography>
                 </Stack>
@@ -333,7 +339,41 @@ export function JobsList(): React.JSX.Element {
             </Grid>
           </Grid>
         </Box>
-        {/* ) : null} */}
+
+        {/* Category Selection Buttons */}
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mb: 4 }}>
+          <Button
+            variant={selectedCategory === 'Internship' ? undefined : 'outlined'}
+            onClick={() => handleCategoryChange('Internship')}
+            sx={{
+              backgroundColor: selectedCategory === 'Internship' ? '#3B82F6' : 'transparent',
+              color: selectedCategory === 'Internship' ? '#fff' : '#3B82F6',
+              borderColor: '#3B82F6',
+              minWidth: 200,
+              py: 2,
+              fontSize: '1.1rem',
+              fontWeight: 'bold'
+            }}
+          >
+            Internships
+          </Button>
+          <Button
+            variant={selectedCategory === 'Full-time' ? undefined : 'outlined'}
+            onClick={() => handleCategoryChange('Full-time')}
+            sx={{
+              backgroundColor: selectedCategory === 'Full-time' ? '#3B82F6' : 'transparent',
+              color: selectedCategory === 'Full-time' ? '#fff' : '#3B82F6',
+              borderColor: selectedCategory === 'Full-time' ? '#3B82F6' : '#3B82F6',
+              minWidth: 200,
+              py: 2,
+              fontSize: '1.1rem',
+              fontWeight: 'bold'
+            }}
+          >
+            Full-Time Roles
+          </Button>
+        </Box>
+
         <JobsFilters onFilterChange={handleFilterChange} />
         <AnimatePresence mode="wait">
           {isLoading ? (

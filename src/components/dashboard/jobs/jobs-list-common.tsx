@@ -168,7 +168,7 @@ export function JobsList(): React.JSX.Element {
         ...(filters.paymentTypes.length > 0 && { paymentTypes: filters.paymentTypes.join(',') }),
       });
 
-      const response = await fetch(`http://localhost:3005/api/jobs/com-jobs?${queryParams.toString()}`);
+      const response = await fetch(`http://135.181.215.55:3005/api/jobs/com-jobs?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

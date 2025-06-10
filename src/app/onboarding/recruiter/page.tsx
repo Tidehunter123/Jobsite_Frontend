@@ -25,10 +25,16 @@ import { config } from '@/config';
 import { UserContext } from '@/contexts/auth/supabase/user-context';
 import { FileDropzone } from '@/components/core/file-dropzone';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+import { toast } from '@/components/core/toaster';
 
 const base = new Airtable({
   apiKey: config.airtable.apiKey,
 }).base(config.airtable.baseId || '');
+const supabase = createClient(
+  config.supabase.url || '',
+  config.supabase.roleKey || ''
+);
 
 const useUser = () => {
   const context = useContext(UserContext);
@@ -223,7 +229,7 @@ function Step1({ onNext }: { onNext: () => void }) {
 }
 
 function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [logo, setLogo] = useState<File[]>([]);
+  const [logo, setLogo] = React.useState<File | null>(null);
   const [type, setType] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [website, setWebsite] = useState('');
@@ -248,31 +254,68 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
     setError(null);
 
     try {
-      // Upload logo if exists
-      let logoUrl = '';
-      if (logo.length > 0) {
-        // TODO: Implement logo upload to your storage service
-        // For now, we'll skip logo upload
-      }
 
-      // Save to Airtable
-      await base('Job Board Clients').create([
-        {
-          fields: {
-            'Name': companyName,
-            'Email': email,
-            'Type': type,
-            'Website': website,
-            'Linkedin': linkedin,
-            'Based_State': basedState,
-            'Based_City': basedCity,
-            'Primary Recruiter Name': primaryRecruiterName,
-            'Primary Recruiter Email': primaryRecruiterEmail,
-            'Description': description,
-            'Logo': logoUrl,
-          },
-        },
-      ]);
+      const recordData = {
+        'Name': companyName,
+        'Email': email,
+        'Type': type,
+        'Website': website,
+        'Linkedin': linkedin,
+        'Based_State': basedState,
+        'Based_City': basedCity,
+        'Primary Recruiter Name': primaryRecruiterName,
+        'Primary Recruiter Email': primaryRecruiterEmail,
+        'Description': description,
+      } 
+
+      if (logo) {
+        try {
+          // Upload file to Supabase Storage
+          const fileName = logo.name;
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('logo')
+            .upload(fileName, logo);
+
+          if (uploadError) {
+            throw new Error('Failed to upload resume to storage');
+          }
+
+          // Get the public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('logo')
+            .getPublicUrl(fileName);
+
+          // First create the record without the attachment
+          const record = await base('Job Board Clients').create({
+            ...recordData,
+            Logo: [], // Initialize with empty array
+          });
+
+          // Then update the record with the Supabase URL
+          await base('Job Board Clients').update([
+            {
+              id: record.id,
+              fields: {
+                Logo: [
+                  {
+                    url: publicUrl,
+                  }
+                ]
+              }
+            }
+          ]);
+          setTimeout(() => {
+            supabase.storage.from('logo').remove([fileName]);
+          }, 3000);
+        } catch (error) {
+          console.error('Error uploading logo:', error);
+          toast.error('Failed to upload logo. Please try again.');
+          return;
+        }
+      } else {
+        // Create the record without attachment
+        await base('Job Board Clients').create(recordData);
+      }
 
       onNext();
     } catch (err) {
@@ -349,7 +392,22 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
             >
               Logo*
             </Typography>
-            <FileDropzone files={logo} onDrop={(files) => setLogo(files)} caption="Upload Logo or drag it in" />
+            <FileDropzone  onDrop={(acceptedFiles: File[]) => setLogo(acceptedFiles[0] || null)} caption="Upload Logo or drag it in" />
+            
+            {logo && (
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1,
+                color: 'text.secondary',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              Uploaded: {logo.name}
+            </Typography>
+          )}
           </Box>
           <input type="hidden" value={email} />
           <FormControl fullWidth>

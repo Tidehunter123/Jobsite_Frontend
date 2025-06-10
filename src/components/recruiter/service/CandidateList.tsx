@@ -1,31 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CandidateCard } from "./CandidateCard";
-import { Box, Container } from "@mui/material";
+import { Box, Container, CircularProgress } from "@mui/material";
+import { getCandidatesByOrderId, CandidateProfile } from "../../../utils/airtable";
+import { useSearchParams } from "next/navigation";
 
-const candidates = [
-  { name: "Charles Farrell", title: "Senior Associate", company: "Apex Bridge Equity Partners" },
-  { name: "Kathryn Smith", title: "Vice President", company: "Redwood Meridian Capital" },
-  {
-    name: "Lindsay Hinton",
-    title: "Senior Associate",
-    company: "Axiom Credit Partners",
-    photo: "/lindsay.jpg",
-    degree: "B.S. Business Administration, 3.8 GPA",
-    location: "Austin, Texas"
+export function CandidateList({ onSetupInterview }: { onSetupInterview: (candidate: CandidateProfile) => void }) {
+  const [candidates, setCandidates] = useState<CandidateProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const searchParams = useSearchParams();
+  const orderId = searchParams?.get('orderId');
+
+  // Load expanded state from localStorage on mount
+  useEffect(() => {
+    const savedExpandedIdx = localStorage.getItem(`expandedIdx-${orderId}`);
+    if (savedExpandedIdx !== null) {
+      setExpandedIdx(parseInt(savedExpandedIdx, 10));
+    }
+  }, [orderId]);
+
+  // Save expanded state to localStorage when it changes
+  useEffect(() => {
+    if (expandedIdx !== null) {
+      localStorage.setItem(`expandedIdx-${orderId}`, expandedIdx.toString());
+    } else {
+      localStorage.removeItem(`expandedIdx-${orderId}`);
+    }
+  }, [expandedIdx, orderId]);
+
+  useEffect(() => {
+    async function fetchCandidates() {
+      if (!orderId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const data = await getCandidatesByOrderId(orderId);
+        console.log('data', data);
+        setCandidates(data);
+      } catch (error) {
+        console.error('Error fetching candidates:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCandidates();
+  }, [orderId]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
   }
-];
 
-export function CandidateList() {
-  const [expandedIdx, setExpandedIdx] = useState(2); // Lindsay expanded by default
+  if (!candidates.length) {
+    return (
+      <Box textAlign="center" py={4}>
+        No candidates found for this order.
+      </Box>
+    );
+  }
+
   return (
     <Container maxWidth="md">
       <Box sx={{ py: 3 }}>
-        {candidates.map((c, idx) => (
+        {candidates.map((candidate, idx) => (
           <CandidateCard
-            key={c.name}
-            candidate={c}
+            key={candidate.id}
+            candidate={candidate}
             expanded={expandedIdx === idx}
-            onExpand={() => setExpandedIdx(idx)}
+            onExpand={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
+            onSetupInterview={() => onSetupInterview(candidate)}
           />
         ))}
       </Box>

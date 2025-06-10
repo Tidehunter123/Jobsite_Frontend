@@ -9,7 +9,14 @@ export function ATSTracker({ currentStep }: { currentStep: number }) {
       <Stepper activeStep={currentStep} alternativeLabel>
         {steps.map((label) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            <StepLabel
+              sx={{
+                '& .MuiStepIcon-root.Mui-active': { color: '#3B82F6' },
+                '& .MuiStepIcon-root.Mui-completed': { color: '#3B82F6' }
+              }}
+            >
+              {label}
+            </StepLabel>
           </Step>
         ))}
       </Stepper>

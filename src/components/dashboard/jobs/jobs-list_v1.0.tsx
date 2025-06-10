@@ -328,7 +328,7 @@ export function JobsList(): React.JSX.Element {
         user: userEmail,
       });
 
-      const response = await fetch(`http://localhost:3005/api/jobs/jobs?${queryParams.toString()}`);
+      const response = await fetch(`http://135.181.215.55:3005/api/jobs/jobs?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

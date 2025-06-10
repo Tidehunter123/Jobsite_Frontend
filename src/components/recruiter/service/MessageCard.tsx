@@ -12,13 +12,13 @@ export function MessageCard() {
         />
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">
-            Cam
+            Gus
           </Typography>
-          <Typography variant="subtitle2" color="primary" fontWeight="600">
-            GoBuyside Search Lead
+          <Typography variant="subtitle2" color="#3B82F6" fontWeight="600">
+            Deal Team Jobs
           </Typography>
           <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-            Austin VP Search: Day 5 Update
+            Today's Update
           </Typography>
           <Typography variant="body1" color="text.secondary">
             We've vetted a short list of strong candidates for your review.
