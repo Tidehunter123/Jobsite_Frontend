@@ -18,7 +18,7 @@ export default function JobPostingPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`http://localhost:3005/api/jobs/jobs/${id}`)
+    fetch(`http://135.181.215.55:3005/api/jobs/jobs/${id}`)
       .then((res) => res.json())
       .then((data: Job) => {
         setJob(data);
