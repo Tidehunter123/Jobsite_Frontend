@@ -299,7 +299,7 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
                 Logo: [
                   {
                     url: publicUrl,
-                  }
+                  } as any
                 ]
               }
             }

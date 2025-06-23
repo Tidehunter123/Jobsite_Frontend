@@ -12,6 +12,7 @@ export interface MultiSelectProps<T = string> {
   onChange?: (value: T[]) => void;
   options: readonly { label: string; value: T }[];
   value: T[];
+  sx?: object;
 }
 
 export function MultiSelect<T = string>({
@@ -19,6 +20,7 @@ export function MultiSelect<T = string>({
   onChange,
   options,
   value = [],
+  sx,
 }: MultiSelectProps<T>): React.JSX.Element {
   const popover = usePopover<HTMLButtonElement>();
 
@@ -37,6 +39,28 @@ export function MultiSelect<T = string>({
     [onChange, value]
   );
 
+  // Create display text for the button
+  const getDisplayText = () => {
+    if (value.length === 0) {
+      return label;
+    }
+    
+    if (value.length === 1) {
+      const selectedOption = options.find(option => option.value === value[0]);
+      return selectedOption ? selectedOption.label : label;
+    }
+    
+    if (value.length <= 2) {
+      const selectedLabels = value.map(v => {
+        const option = options.find(option => option.value === v);
+        return option ? option.label : '';
+      }).filter(Boolean);
+      return selectedLabels.join(', ');
+    }
+    
+    return `${value.length} selected`;
+  };
+
   return (
     <React.Fragment>
       <Button
@@ -44,9 +68,19 @@ export function MultiSelect<T = string>({
         endIcon={<CaretDownIcon />}
         onClick={popover.handleOpen}
         ref={popover.anchorRef}
-        sx={{ '& .MuiButton-endIcon svg': { fontSize: 'var(--icon-fontSize-sm)' } }}
+        sx={{ 
+          '& .MuiButton-endIcon svg': { fontSize: 'var(--icon-fontSize-sm)' }, 
+          ...sx,
+          ...(value.length > 0 && {
+            backgroundColor: '#E3F2FD',
+            color: '#1976D2',
+            '&:hover': {
+              backgroundColor: '#BBDEFB',
+            }
+          })
+        }}
       >
-        {label}
+        {getDisplayText()}
       </Button>
       <Menu
         anchorEl={popover.anchorRef.current}

@@ -51,11 +51,20 @@ export function SignInForm(): React.JSX.Element {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  // Add debugging for anchorEl state changes
+  React.useEffect(() => {
+    console.log('anchorEl changed:', anchorEl);
+    console.log('Menu should be open:', Boolean(anchorEl));
+  }, [anchorEl]);
+
   const handleSignUpClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('handleSignUpClick');
+    console.log('anchorEl will be set to:', event.currentTarget);
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
+    console.log('handleClose called');
     setAnchorEl(null);
   };
 
@@ -128,8 +137,18 @@ export function SignInForm(): React.JSX.Element {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           PaperProps={{
-            sx: { borderRadius: 3, boxShadow: 3, mt: 1, minWidth: 220 },
+            sx: { 
+              borderRadius: 3, 
+              boxShadow: 3, 
+              mt: 1, 
+              minWidth: 220,
+              zIndex: 99999 // Ensure menu appears above everything
+            },
           }}
+          sx={{
+            zIndex: 99999 // Ensure menu container has high z-index
+          }}
+          container={() => document.body} // Render menu in body to avoid clipping
         >
           <MenuItem onClick={handleSignUpJobSeeker}>I'm looking for a job</MenuItem>
           <MenuItem onClick={handleSignUpRecruiter}>I'm looking for candidates</MenuItem>

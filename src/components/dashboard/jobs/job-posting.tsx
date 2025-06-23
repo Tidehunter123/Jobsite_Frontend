@@ -1,40 +1,44 @@
 import React from 'react';
-import { Avatar, Box, Button, Grid, Link as MuiLink, Paper, Typography } from '@mui/material';
+import { useContext } from 'react';
+import { Avatar, Box, Button, Grid, Link as MuiLink, Paper, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import Airtable from 'airtable';
 import dayjs from 'dayjs';
 import {
   FaBriefcase,
+  FaBuilding,
   FaCalendarAlt,
+  FaChartLine,
+  FaCheckCircle,
   FaFacebookF,
+  FaGlobe,
   FaGraduationCap,
   FaHourglassHalf,
+  FaIndustry,
   FaInstagram,
   FaLinkedinIn,
   FaMapMarkerAlt,
   FaMoneyBillWave,
   FaTwitter,
+  FaUsers,
+  FaUserTie,
+  FaCheck,
+  FaTimes,
+  FaExclamationTriangle,
 } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 
-import { type Job } from './job-card';
+import { config } from '@/config';
+import { UserContext } from '@/contexts/auth/user-context';
 
-function CompanyInfoCard({
-  logo,
-  name,
-  category,
-  location,
-  email,
-  socials,
-  website,
-}: {
-  logo?: string;
-  name: string;
-  category?: string;
-  location?: string;
-  phone?: string;
-  email?: string;
-  socials?: { type: string; url: string }[];
-  website?: string;
-}) {
+import { type Job } from './job-card';
+import { toast } from '@/components/core/toaster';
+import { useRouter } from 'next/navigation';
+
+const base = new Airtable({
+  apiKey: config.airtable.apiKey,
+}).base(config.airtable.baseId || '');
+
+function SponsorInfoCard({ sponsorType, aboutSponsor }: { sponsorType?: string; aboutSponsor?: string }) {
   return (
     <Paper
       elevation={0}
@@ -42,96 +46,202 @@ function CompanyInfoCard({
         borderRadius: 3,
         p: 3,
         bgcolor: '#f7fafd',
-        boxShadow: '0 2px 12px 0 rgba(16,30,54,.08)',
         textAlign: 'center',
         mb: 3,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: '#2563eb' }}>
+        {sponsorType}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'justify', lineHeight: 1.6 }}>
+        {aboutSponsor || 'No sponsor information available.'}
+      </Typography>
+    </Paper>
+  );
+}
+
+function RecruiterInfoCard({
+  recruiterFirstName,
+  recruiterPicture,
+  recruiterBio,
+  recruiterEmail,
+  recruiterPhone,
+}: {
+  recruiterFirstName?: string;
+  recruiterPicture?: { url: string }[];
+  recruiterBio?: string;
+  recruiterEmail?: string;
+  recruiterPhone?: string;
+  }) {
+  if (!recruiterFirstName) {
+    return null;
+  }
+
+  const handleEmailClick = () => {
+    if (recruiterEmail) {
+      window.open(`mailto:${recruiterEmail}?subject=Regarding ${recruiterFirstName}'s job posting`, '_blank');
+    }
+  };
+
+  const handlePhoneClick = () => {
+    if (recruiterPhone) {
+      window.open(`tel:${recruiterPhone}`, '_blank');
+    }
+  };
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        p: 3,
+        bgcolor: 'white',
+        mb: 3,
+        border: '1px solid #e2e8f0',
+      }}
+    >
+      <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
+        About the Recruiter
+      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <Avatar
-          src={logo}
-          alt={name}
-          sx={{ width: 80, height: 80, borderRadius: 2, bgcolor: 'grey.100' }}
-          variant="rounded"
+          src={recruiterPicture?.[0]?.url}
+          alt={recruiterFirstName}
+          sx={{ width: 60, height: 60, mr: 2 }}
         />
         <Box>
-          <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>
-            {name}
+          <Typography variant="h6" fontWeight={600}>
+            {recruiterFirstName}
           </Typography>
-          <MuiLink target="_blank" rel="noopener" sx={{ display: 'block', mb: 1, color: '#3b82f6' }}>
-            View Company Profile
-          </MuiLink>
         </Box>
       </Box>
-
-      <Box sx={{ textAlign: 'left', mt: 2, mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography color="text.secondary">categories:</Typography>
-          <Typography>{category}</Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6, mb: 3 }}>
+        {recruiterBio}
+      </Typography>
+      
+      {/* Contact Information */}
+      {(recruiterEmail || recruiterPhone) && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1, color: '#2563eb' }}>
+            Contact Information
+          </Typography>
+          {recruiterEmail && (
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                Email:
+              </Typography>
+              <MuiLink
+                href={`mailto:${recruiterEmail}`}
+                onClick={handleEmailClick}
+                sx={{ 
+                  color: '#2563eb', 
+                  textDecoration: 'none',
+                  '&:hover': { textDecoration: 'underline' }
+                }}
+              >
+                {recruiterEmail}
+              </MuiLink>
+            </Box>
+          )}
+          {recruiterPhone && (
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                Phone:
+              </Typography>
+              <MuiLink
+                href={`tel:${recruiterPhone}`}
+                onClick={handlePhoneClick}
+                sx={{ 
+                  color: '#2563eb', 
+                  textDecoration: 'none',
+                  '&:hover': { textDecoration: 'underline' }
+                }}
+              >
+                {recruiterPhone}
+              </MuiLink>
+            </Box>
+          )}
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography color="text.secondary">Location:</Typography>
-          <Typography>{location}</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography color="text.secondary">Email:</Typography>
-          <MuiLink href={`mailto:${email}`} color="#3b82f6">
-            {email}
-          </MuiLink>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography color="text.secondary">Socials:</Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {socials?.map((s, idx) => {
-              if (s.type === 'facebook')
-                return (
-                  <MuiLink key={idx} href={s.url} color="#3b82f6">
-                    <FaFacebookF />
-                  </MuiLink>
-                );
-              if (s.type === 'twitter')
-                return (
-                  <MuiLink key={idx} href={s.url} color="#3b82f6">
-                    <FaTwitter />
-                  </MuiLink>
-                );
-              if (s.type === 'linkedin')
-                return (
-                  <MuiLink key={idx} href={s.url} color="#3b82f6">
-                    <FaLinkedinIn />
-                  </MuiLink>
-                );
-              if (s.type === 'instagram')
-                return (
-                  <MuiLink key={idx} href={s.url} color="#3b82f6">
-                    <FaInstagram />
-                  </MuiLink>
-                );
-              return null;
-            })}
-          </Box>
-        </Box>
-      </Box>
-      {website ? (
-        <Box
-          sx={{
-            bgcolor: 'rgba(59, 130, 246, 0.08)',
-            borderRadius: 2,
-            py: 1,
-            mt: 2,
+      )}
+      
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <Button
+          variant="outlined"
+          href={`tel:${recruiterPhone}`}
+          sx={{ 
+            flex: 1, 
+            borderColor: '#e2e8f0', 
+            color: 'text.primary',
+            '&:hover': {
+              borderColor: '#2563eb',
+              color: '#2563eb'
+            }
           }}
         >
-          <MuiLink href={website} target="_blank" rel="noopener" sx={{ color: '#3b82f6', fontWeight: 500 }}>
-            {website}
-          </MuiLink>
-        </Box>
-      ) : null}
+          Connect with Recruiter
+        </Button>
+        {recruiterEmail && (
+          <Button
+            onClick={handleEmailClick}
+            sx={{ 
+              flex: 1, 
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#3b82f6'
+              }
+            }}
+          >
+            Send Email
+          </Button>
+        )}
+      </Box>
     </Paper>
   );
 }
 
 export default function JobPosting({ job }: { job: Job }) {
   if (!job) return <Typography>No job data found.</Typography>;
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error('UserContext is not available. Make sure the component is wrapped in a UserProvider.');
+  }
+  const { user } = userContext;
+  const router = useRouter();
+  
+  // Add state for modal
+  const [openConfirmModal, setOpenConfirmModal] = React.useState(false);
+
+  const handleApply = async () => {
+    const userQuery = await base('Candidate Database')
+      .select({
+        filterByFormula: `{Login Email} = '${user?.email}'`,
+      })
+      .firstPage();
+    const application = await base('Applications').create({
+      'Job Posting Id': job.jobPostingId,
+      Name: userQuery[0].get('First Name') + ' ' + userQuery[0].get('Last Name'),
+    });
+    if(application) {
+      toast.success('Application submitted successfully.');
+      router.push('/dashboard');
+    } else {
+      toast.error('Failed to submit application.');
+    }
+  };
+
+  const handleApplyClick = () => {
+    setOpenConfirmModal(true);
+  };
+
+  const handleConfirmApply = () => {
+    setOpenConfirmModal(false);
+    handleApply();
+  };
+
+  const handleCancelApply = () => {
+    setOpenConfirmModal(false);
+  };
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: { xs: 2, md: 4 } }}>
@@ -144,7 +254,7 @@ export default function JobPosting({ job }: { job: Job }) {
           justifyContent: 'space-between',
           bgcolor: 'white',
           borderRadius: 3,
-          px: { xs: 2, sm: 3, md: 5, lg: 10 },
+          px: { xs: 6, sm: 6, md: 15, lg: 20 },
           py: { xs: 2, sm: 3, md: 5 },
           boxShadow: 1,
           mb: 4,
@@ -153,7 +263,7 @@ export default function JobPosting({ job }: { job: Job }) {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
           <Avatar
-            src={job.companyLogo?.[0]?.url || job.companyLogo?.[0]?.thumbnails?.small?.url}
+            src={job.logo?.[0]?.url || job.logo?.[0]?.thumbnails?.small?.url}
             alt={job.companyName}
             sx={{
               width: { xs: 60, sm: 80, md: 100 },
@@ -165,39 +275,40 @@ export default function JobPosting({ job }: { job: Job }) {
             variant="rounded"
           />
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h5" fontWeight={700} sx={{ mb: 1, fontSize: { xs: 18, sm: 22, md: 28 } }}>
+            <Typography variant="h5" fontWeight={700} sx={{ mb: 1, fontSize: { xs: 20, sm: 24, md: 30 } }}>
               {job.jobTitle}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <FaBriefcase size={16} />
                 <Typography variant="body2" color="text.secondary">
-                  {job.jobType?.join(', ') || 'N/A'}
+                  {job.experienceLevel || 'N/A'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <FaBuilding size={16} />
+                <Typography variant="body2" color="text.secondary">
+                  {job.functionArea || 'N/A'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <FaUserTie size={16} />
+                <Typography variant="body2" color="text.secondary">
+                  {job.roleType || 'N/A'}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <FaMapMarkerAlt size={16} />
                 <Typography variant="body2" color="text.secondary">
-                  {job.location || job.remoteInPerson}
+                  {job.city || 'N/A'}, {job.state || 'N/A'}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <FaCalendarAlt size={16} />
                 <Typography variant="body2" color="text.secondary">
-                  {dayjs(job.created_At).format('MMM D, YYYY')}
+                  {dayjs(job.postedOn).format('MMM D, YYYY')}
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <FaMoneyBillWave size={16} />
-                <Typography variant="body2" color="text.secondary">
-                  {job.paidUnpaid}
-                </Typography>
-              </Box>
-              {job.hoursPerWeek ? (
-                <Typography variant="body2" color="text.secondary">
-                  {job.hoursPerWeek} hrs/week
-                </Typography>
-              ) : null}
             </Box>
           </Box>
         </Box>
@@ -212,31 +323,25 @@ export default function JobPosting({ job }: { job: Job }) {
             mt: { xs: 2, md: 0 },
           }}
         >
-          <Typography variant="body2" sx={{ mb: 1, textAlign: { xs: 'center', md: 'left' } }}>
-            Application ends: <b style={{ color: 'red' }}>{dayjs(job.anticipatedEndDate).format('MMM D, YYYY')}</b>
-          </Typography>
-          {job.applicationLink ? (
-            <MuiLink href={job.applicationLink} target="_blank" rel="noopener noreferrer" underline="none">
-              <Button
-                size="large"
-                sx={{ minWidth: { xs: '100%', md: 215 }, backgroundColor: '#52cab1', color: 'white', hover: 'none' }}
-              >
-                Apply Now
-              </Button>
-            </MuiLink>
-          ) : (
-            <Button
-              size="large"
-              sx={{ minWidth: { xs: '100%', md: 215 }, backgroundColor: '#52cab1', color: 'white', hover: 'none' }}
-            >
-              Apply Now
-            </Button>
-          )}
+          <Button
+            size="large"
+            onClick={handleApplyClick}
+            sx={{ minWidth: { xs: '100%', md: 215 }, backgroundColor: '#3b82f6', color: 'white', hover: 'none' }}
+          >
+            Apply Now
+          </Button>
         </Box>
       </Box>
       {/* DETAILS */}
-      <Grid container spacing={4} justifyContent="center">
+      <Grid container spacing={4} justifyContent="center" sx={{ px: { xs: 6, sm: 6, md: 10, lg: 10 } }}>
         <Grid item xs={12} md={8} order={{ xs: 2, md: 1 }}>
+          <RecruiterInfoCard
+            recruiterFirstName={job.recruiterFirstName}
+            recruiterPicture={job.recruiterPicture}
+            recruiterBio={job.recruiterBio}
+            recruiterEmail={job.recruiterEmail}
+            recruiterPhone={job.recruiterPhone}
+          />
           <Paper sx={{ p: { xs: 2, md: 4 }, mb: 3, border: '0px' }}>
             <Typography variant="h5" fontWeight={600} gutterBottom>
               Job Description
@@ -245,83 +350,261 @@ export default function JobPosting({ job }: { job: Job }) {
           </Paper>
         </Grid>
         <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
-          <CompanyInfoCard
-            logo={job.companyLogo?.[0]?.url}
-            name={job.companyName}
-            category={job.companyType}
-            location={job.location}
-            email={job.email}
-            socials={[
-              { type: 'facebook', url: '#' },
-              { type: 'twitter', url: '#' },
-              { type: 'linkedin', url: '#' },
-              { type: 'instagram', url: '#' },
-            ]}
-            website={job.website}
-          />
+          <SponsorInfoCard sponsorType={job.sponsorType} aboutSponsor={job.aboutTheSponsor} />
           <Paper elevation={0} sx={{ p: { xs: 3, md: 3 }, borderRadius: 3, mb: 3, bgcolor: '#f7fafd' }}>
             <Typography variant="h6" fontWeight={600} mb={2}>
               Job Overview
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-              <FaCalendarAlt color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <FaChartLine color="#2563eb" size={22} style={{ marginTop: 2 }} />
               <Box>
                 <Typography fontWeight={600} color="text.primary">
-                  Date Posted
+                  Company Revenue
                 </Typography>
-                <Typography color="text.secondary">{dayjs(job.created_At).format('MMM D, YYYY')}</Typography>
+                <Typography color="text.secondary">{job.companyRevenue}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-              <FaMapMarkerAlt color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <FaUsers color="#2563eb" size={22} style={{ marginTop: 2 }} />
               <Box>
                 <Typography fontWeight={600} color="text.primary">
-                  Location
+                  Employees
                 </Typography>
-                <Typography color="text.secondary">{job.location || job.remoteInPerson}</Typography>
+                <Typography color="text.secondary">{job.employees}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+              <FaIndustry color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <Box>
+                <Typography fontWeight={600} color="text.primary">
+                  Broad Industry
+                </Typography>
+                <Typography color="text.secondary">{job.broadIndustry}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+              <FaBuilding color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <Box>
+                <Typography fontWeight={600} color="text.primary">
+                  Specific Industry
+                </Typography>
+                <Typography color="text.secondary">{job.specificIndustry}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+              <FaCheckCircle color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <Box>
+                <Typography fontWeight={600} color="text.primary">
+                  Industry Experience Required?
+                </Typography>
+                <Typography color="text.secondary">{job.industryExperienceRequired}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
               <FaMoneyBillWave color="#2563eb" size={22} style={{ marginTop: 2 }} />
               <Box>
                 <Typography fontWeight={600} color="text.primary">
-                  Compensation
+                  Equity?
                 </Typography>
-                <Typography color="text.secondary">
-                  {job.paidUnpaid} {job.hoursPerWeek ? `(${job.hoursPerWeek} hrs/week)` : ''}
-                </Typography>
+                <Typography color="text.secondary">{job.equity}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-              <FaHourglassHalf color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <FaGlobe color="#2563eb" size={22} style={{ marginTop: 2 }} />
               <Box>
                 <Typography fontWeight={600} color="text.primary">
-                  Ideal Start Date
+                  Region
                 </Typography>
-                <Typography color="text.secondary">{dayjs(job.idealStartDate).format('MMM D, YYYY')}</Typography>
+                <Typography color="text.secondary">{job.region}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-              <FaHourglassHalf color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <FaMapMarkerAlt color="#2563eb" size={22} style={{ marginTop: 2 }} />
               <Box>
                 <Typography fontWeight={600} color="text.primary">
-                  Anticipated end date
+                  City
                 </Typography>
-                <Typography color="text.secondary">{dayjs(job.anticipatedEndDate).format('MMM D, YYYY')}</Typography>
+                <Typography color="text.secondary">{job.city}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-              <FaGraduationCap color="#2563eb" size={22} style={{ marginTop: 2 }} />
+              <FaMapMarkerAlt color="#2563eb" size={22} style={{ marginTop: 2 }} />
               <Box>
                 <Typography fontWeight={600} color="text.primary">
-                  Candidate Type
+                  State
                 </Typography>
-                <Typography color="text.secondary">{job.jobType?.join(', ') || '-'}</Typography>
+                <Typography color="text.secondary">{job.state}</Typography>
               </Box>
             </Box>
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Confirmation Modal */}
+      <Dialog
+        open={openConfirmModal}
+        onClose={handleCancelApply}
+        aria-labelledby="confirm-application-dialog-title"
+        aria-describedby="confirm-application-dialog-description"
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '1px solid #e2e8f0',
+            overflow: 'hidden',
+          }
+        }}
+      >
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            p: 3,
+            textAlign: 'center',
+            position: 'relative',
+          }}
+        >
+          <DialogTitle 
+            id="confirm-application-dialog-title" 
+            sx={{ 
+              fontWeight: 700, 
+              color: 'white',
+              fontSize: '1.5rem',
+              p: 0,
+              mb: 1,
+            }}
+          >
+            Confirm Your Application
+          </DialogTitle>
+        </Box>
+        
+        <DialogContent sx={{ p: 4, pt: 3 }}>
+          <Box sx={{ mb: 3 }}>
+            <Typography 
+              id="confirm-application-dialog-description" 
+              sx={{ 
+                mb: 3, 
+                fontSize: '1.1rem',
+                lineHeight: 1.6,
+                color: '#374151',
+              }}
+            >
+              Are you sure you want to apply for the{' '}
+              <Box component="span" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                {job.jobTitle}
+              </Box>{' '}
+              position at{' '}
+              <Box component="span" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                {job.companyName}
+              </Box>?
+            </Typography>
+            
+            {/* Job Details Card */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                mb: 3,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Avatar
+                  src={job.logo?.[0]?.url || job.logo?.[0]?.thumbnails?.small?.url}
+                  alt={job.companyName}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 2,
+                    mr: 2,
+                    bgcolor: 'grey.100',
+                  }}
+                  variant="rounded"
+                />
+                <Box>
+                  <Typography variant="h6" fontWeight={600} sx={{ color: '#1f2937', mb: 0.5 }}>
+                    {job.jobTitle}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    {job.companyName}
+                  </Typography>
+                </Box>
+              </Box>
+              
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FaMapMarkerAlt size={14} color="#6b7280" />
+                  <Typography variant="body2" color="text.secondary">
+                    {job.city}, {job.state}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FaBriefcase size={14} color="#6b7280" />
+                  <Typography variant="body2" color="text.secondary">
+                    {job.experienceLevel}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FaUserTie size={14} color="#6b7280" />
+                  <Typography variant="body2" color="text.secondary">
+                    {job.roleType}
+                  </Typography>
+                </Box>
+              </Box>
+            </Paper>
+          </Box>
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 4, pt: 0, gap: 2 }}>
+          <Button 
+            onClick={handleCancelApply} 
+            variant="outlined"
+            startIcon={<FaTimes />}
+            sx={{ 
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              borderColor: '#d1d5db',
+              color: '#6b7280',
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              '&:hover': {
+                borderColor: '#9ca3af',
+                backgroundColor: '#f9fafb',
+              }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmApply} 
+            variant="contained"
+            startIcon={<FaCheck />}
+            sx={{ 
+              px: 4,
+              py: 1.5,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              color: 'white',
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.4)',
+              }
+            }}
+            autoFocus
+          >
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

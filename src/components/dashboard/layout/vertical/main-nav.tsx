@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Container, useMediaQuery, useTheme } from '@mui/material';
@@ -21,7 +22,6 @@ import { Logo } from '@/components/core/logo';
 
 import { MobileNav } from '../mobile-nav';
 import { UserPopover } from '../user-popover/user-popover';
-import { useEffect } from 'react';
 
 export interface MainNavProps {
   items: NavItemConfig[];
@@ -64,29 +64,29 @@ export function MainNav({ items }: MainNavProps): React.JSX.Element {
           }}
         >
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flex: 1, ml: 20 }}>
-            <Box component={RouterLink} href="https://dealteamjobs.com/" sx={{ display: 'inline-flex' }}>
+            <Box component={RouterLink} href="/" sx={{ display: 'inline-flex' }}>
               <Logo color="light" height={30} width={150} />
             </Box>
-            {pathname !== '/onboarding/recruiter' && !(pathname?.includes('/dashboard')) && (
+            {pathname !== '/onboarding/recruiter' && !pathname?.includes('/dashboard') && pathname !== '/' && (
               <Stack direction="row" spacing={4} sx={{ ml: 6 }}>
                 {items[0]?.items?.map((item) => (
                   <Box key={item.title} sx={{ position: 'relative', display: 'inline-block' }}>
                     <RouterLink
-                    href={item.href || '#'}
-                    style={{
-                      color: '#0A2540',
-                      fontWeight: 600,
-                      fontSize: '16px',
-                      textDecoration: pathname === item.href ? 'underline' : 'none',
-                      position: 'relative',
-                      padding: '8px 16px',
-                      transition: 'color 0.2s',
-                      display: 'inline-block',
-                    }}
-                  >
-                    {item.title}
-                  </RouterLink>
-                </Box>
+                      href={item.href || '#'}
+                      style={{
+                        color: '#0A2540',
+                        fontWeight: 600,
+                        fontSize: '16px',
+                        textDecoration: pathname === item.href ? 'underline' : 'none',
+                        position: 'relative',
+                        padding: '8px 16px',
+                        transition: 'color 0.2s',
+                        display: 'inline-block',
+                      }}
+                    >
+                      {item.title}
+                    </RouterLink>
+                  </Box>
                 ))}
               </Stack>
             )}
@@ -100,12 +100,16 @@ export function MainNav({ items }: MainNavProps): React.JSX.Element {
               mr: 5,
             }}
           >
-            <Divider
-              flexItem
-              orientation="vertical"
-              sx={{ borderColor: 'var(--MainNav-divider)', display: { xs: 'none', lg: 'block' } }}
-            />
-            <UserButton />
+            {pathname !== '/' && (
+              <>
+                <Divider
+                  flexItem
+                  orientation="vertical"
+                  sx={{ borderColor: 'var(--MainNav-divider)', display: { xs: 'none', lg: 'block' } }}
+                />
+                <UserButton />
+              </>
+            )}
           </Stack>
         </Container>
       </Box>

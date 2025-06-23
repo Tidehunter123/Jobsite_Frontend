@@ -1,7 +1,7 @@
 import React from "react";
 import { Stepper, Step, StepLabel, Box } from "@mui/material";
 
-const steps = ["Applicants", "Interview", "Case Study", "Offer"];
+const steps = ["Shortlist", "First Round Interview", "Finalists", "Offer"];
 
 export function ATSTracker({ currentStep }: { currentStep: number }) {
   return (

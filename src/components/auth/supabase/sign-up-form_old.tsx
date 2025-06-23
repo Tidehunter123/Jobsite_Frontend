@@ -41,9 +41,11 @@ const base = new Airtable({
 }).base(config.airtable.baseId || '');
 
 export function SignUpForm({
-  role
+  role,
+  rolePreferences,
 }: {
   role?: string;
+  rolePreferences?: { roleType: string; interestArea: string } | null;
 }) {
   const [supabaseClient] = React.useState<SupabaseClient>(createSupabaseClient());
 
@@ -142,6 +144,88 @@ export function SignUpForm({
           return;
         } else {
           console.log('Processing candidate sign-up');
+          // Add to SFF Candidate Database
+          try {
+            const roleType = rolePreferences?.roleType || '';
+            const interestArea = rolePreferences?.interestArea || '';
+            console.log('Candidate role type:', roleType, 'Interest area:', interestArea);
+
+            if (roleType === 'internship') {
+              console.log('Processing internship candidate');
+              const existing = await base('Internship')
+                .select({
+                  filterByFormula: `{Email} = '${values.email}'`,
+                  maxRecords: 1,
+                })
+                .firstPage();
+
+              console.log('Existing internship candidate check:', existing.length > 0 ? 'Found' : 'Not found');
+
+              if (existing.length === 0) {
+                console.log('Creating new internship candidate entry');
+                // If not exist, add new user
+                await base('Internship').create([
+                  {
+                    fields: {
+                      Email: values.email,
+                      'First Name': values.firstName,
+                      'Last Name': values.lastName,
+                      'New User': true,
+                      'Job Board Access': true,
+                      'Interest Area': rolePreferences?.interestArea || '',
+                    },
+                  },
+                ]);
+              }
+              if (existing.length > 0) {
+                console.log('Updating existing internship candidate');
+                // If exist, update user
+                await base('Internship').update(existing[0].id, {
+                  'Job Board Access': true,
+                });
+              }
+            }
+            if (roleType === 'fulltime') {
+              console.log('Processing full-time candidate');
+              const existing = await base('Full Time Role')
+                .select({
+                  filterByFormula: `{Email} = '${values.email}'`,
+                  maxRecords: 1,
+                })
+                .firstPage();
+
+              console.log('Existing full-time candidate check:', existing.length > 0 ? 'Found' : 'Not found');
+
+              if (existing.length === 0) {
+                console.log('Creating new full-time candidate entry');
+                // If not exist, add new user
+                await base('FT').create([
+                  {
+                    fields: {
+                      Email: values.email,
+                      'First Name': values.firstName,
+                      'Last Name': values.lastName,
+                      'New User': true,
+                      'Job Board Access': true,
+                      'Interest Area': rolePreferences?.interestArea || '',
+                    },
+                  },
+                ]);
+              }
+              if (existing.length > 0) {
+                console.log('Updating existing full-time candidate');
+                // If exist, update user
+                await base('FT').update(existing[0].id, {
+                  'Job Board Access': true,
+                });
+              }
+            }
+          } catch (err) {
+            console.error('Candidate database error:', err);
+            setError('root', { type: 'server', message: 'Failed to add candidate to database.' });
+            setIsPending(false);
+            return;
+          }
           console.log('Redirecting to sign-up confirmation page for candidate');
           const searchParams = new URLSearchParams({ email: values.email });
           router.push(`${paths.auth.supabase.signUpConfirm}?${searchParams.toString()}`);
@@ -152,7 +236,7 @@ export function SignUpForm({
       console.log('Sign-up process completed');
       setIsPending(false);
     },
-    [supabaseClient, router, setError, role]
+    [supabaseClient, router, setError, role, rolePreferences]
   );
 
   return (

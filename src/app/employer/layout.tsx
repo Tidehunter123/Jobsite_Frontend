@@ -7,5 +7,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
-  return <DynamicLayout>{children}</DynamicLayout>;
+  return (
+      <DynamicLayout>{children}</DynamicLayout>
+  );
 }

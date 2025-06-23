@@ -1,5 +1,7 @@
+'use client';
 import * as React from 'react';
 import RouterLink from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Container, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 
@@ -12,8 +14,11 @@ export interface SplitLayoutProps {
 }
 
 export function SplitLayout({ leftContent, rightContent, children }: SplitLayoutProps): React.JSX.Element {
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+  console.log('isHomePage', isHomePage);
   return (
-    <Box>
+    <Box sx={{ position: 'relative', zIndex: 9999 }}>
       {/* Header */}
       <Box
         component="header"
@@ -31,7 +36,7 @@ export function SplitLayout({ leftContent, rightContent, children }: SplitLayout
       >
         <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '70px', py: 0, ml: 0 }}>
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flex: '1 1 auto', ml:20 }}>
-            <Box component={RouterLink} href="https://dealteamjobs.com/" sx={{ display: 'inline-flex' }}>
+            <Box component={RouterLink} href="/" sx={{ display: 'inline-flex' }}>
               <Logo color="light" height={30} width={150} />
             </Box>
           </Stack>
@@ -69,7 +74,7 @@ export function SplitLayout({ leftContent, rightContent, children }: SplitLayout
           sx={{
             flex: leftContent ? '0 0 480px' : '1',
             width: '100%',
-            display: 'flex',
+            display: isHomePage ? 'block' : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             m: { xs: 0, md: 6 },
