@@ -13,6 +13,8 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import {
   ArrowRight as ArrowRightIcon,
   TextT as BioIcon,
@@ -33,6 +35,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: theme.shape.borderRadius * 1.5,
     transition: 'all 0.3s ease',
+    fontSize: theme.breakpoints.down('sm') ? '16px' : '14px', // Prevent zoom on iOS
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.primary.main,
@@ -48,6 +51,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
   '& .MuiInputLabel-root': {
     fontWeight: 500,
+    fontSize: theme.breakpoints.down('sm') ? '16px' : '14px',
     '&.Mui-focused': {
       color: theme.palette.primary.main,
       fontWeight: 600,
@@ -64,12 +68,16 @@ const FieldContainer = styled(Box)(({ theme }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius * 2,
-  padding: theme.spacing(1.5, 4),
+  padding: theme.breakpoints.down('sm') 
+    ? theme.spacing(2, 3) 
+    : theme.spacing(1.5, 4),
   fontWeight: 600,
   textTransform: 'none',
-  fontSize: '1rem',
+  fontSize: theme.breakpoints.down('sm') ? '1.1rem' : '1rem',
   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
   transition: 'all 0.3s ease',
+  minHeight: theme.breakpoints.down('sm') ? '48px' : '40px',
+  width: theme.breakpoints.down('sm') ? '100%' : 'auto',
   '&:hover': {
     transform: 'translateY(-2px)',
     boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
@@ -103,6 +111,8 @@ const base = new Airtable({
 }).base(config.airtable.baseId || '');
 
 export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void; onSectionComplete?: (completed: boolean) => void }): React.JSX.Element {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error('UserContext is not available. Make sure the component is wrapped in a UserProvider.');
@@ -201,11 +211,11 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={4}>
+      <Stack spacing={isMobile ? 3 : 4}>
         {/* Header */}
         <Box>
           <Typography
-            variant="h4"
+            variant={isMobile ? "h5" : "h4"}
             component="h2"
             gutterBottom
             sx={{
@@ -213,20 +223,28 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
               color: 'text.primary',
               display: 'flex',
               alignItems: 'center',
-              gap: 2,
+              gap: isMobile ? 1 : 2,
+              flexWrap: 'wrap',
             }}
           >
-            <UserIcon size={32} weight="bold" />
+            <UserIcon size={isMobile ? 24 : 32} weight="bold" />
             General Information
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography 
+            variant="body1" 
+            color="text.secondary"
+            sx={{
+              fontSize: isMobile ? '0.9rem' : '1rem',
+              lineHeight: isMobile ? 1.5 : 1.6,
+            }}
+          >
             Let's start with your basic information. This helps us personalize your experience.
           </Typography>
         </Box>
 
         {/* Form Fields */}
-        <Grid container spacing={3}>
-          <Grid item md={6} xs={12}>
+        <Grid container spacing={isMobile ? 2 : 3}>
+          <Grid item xs={12} sm={6}>
             <FieldContainer>
               <Controller
                 control={control}
@@ -236,7 +254,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <InputLabel required>First Name</InputLabel>
                     <OutlinedInput {...field} placeholder="Enter your first name" />
                     {errors.firstName ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.firstName.message}</FormHelperText>
+                      <FormHelperText sx={{ fontWeight: 500, fontSize: isMobile ? '0.8rem' : '0.75rem' }}>{errors.firstName.message}</FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -244,7 +262,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
             </FieldContainer>
           </Grid>
 
-          <Grid item md={6} xs={12}>
+          <Grid item xs={12} sm={6}>
             <FieldContainer>
               <Controller
                 control={control}
@@ -254,7 +272,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <InputLabel required>Last Name</InputLabel>
                     <OutlinedInput {...field} placeholder="Enter your last name" />
                     {errors.lastName ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.lastName.message}</FormHelperText>
+                      <FormHelperText sx={{ fontWeight: 500, fontSize: isMobile ? '0.8rem' : '0.75rem' }}>{errors.lastName.message}</FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -262,7 +280,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
             </FieldContainer>
           </Grid>
 
-          <Grid item md={6} xs={12}>
+          <Grid item xs={12} sm={6}>
             <FieldContainer>
               <Controller
                 control={control}
@@ -272,7 +290,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <InputLabel required>Email Address</InputLabel>
                     <OutlinedInput {...field} type="email" placeholder="your.email@example.com" />
                     {errors.email ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.email.message}</FormHelperText>
+                      <FormHelperText sx={{ fontWeight: 500, fontSize: isMobile ? '0.8rem' : '0.75rem' }}>{errors.email.message}</FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -280,7 +298,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
             </FieldContainer>
           </Grid>
 
-          <Grid item md={6} xs={12}>
+          <Grid item xs={12} sm={6}>
             <FieldContainer>
               <Controller
                 control={control}
@@ -290,7 +308,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <InputLabel required>Phone Number</InputLabel>
                     <OutlinedInput {...field} placeholder="(555) 123-4567" />
                     {errors.phone ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.phone.message}</FormHelperText>
+                      <FormHelperText sx={{ fontWeight: 500, fontSize: isMobile ? '0.8rem' : '0.75rem' }}>{errors.phone.message}</FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -298,7 +316,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
             </FieldContainer>
           </Grid>
 
-          <Grid item md={6} xs={12}>
+          <Grid item xs={12} sm={6}>
             <FieldContainer>
               <Controller
                 control={control}
@@ -308,7 +326,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <InputLabel required>City</InputLabel>
                     <OutlinedInput {...field} placeholder="Enter your city" />
                     {errors.city ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.city.message}</FormHelperText>
+                      <FormHelperText sx={{ fontWeight: 500, fontSize: isMobile ? '0.8rem' : '0.75rem' }}>{errors.city.message}</FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -316,7 +334,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
             </FieldContainer>
           </Grid>
 
-          <Grid item md={6} xs={12}>
+          <Grid item xs={12} sm={6}>
             <FieldContainer>
               <Controller
                 control={control}
@@ -326,7 +344,7 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <InputLabel required>State</InputLabel>
                     <OutlinedInput {...field} placeholder="Enter your state" />
                     {errors.state ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.state.message}</FormHelperText>
+                      <FormHelperText sx={{ fontWeight: 500, fontSize: isMobile ? '0.8rem' : '0.75rem' }}>{errors.state.message}</FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -345,10 +363,10 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
                     <OutlinedInput
                       {...field}
                       multiline
-                      rows={4}
+                      rows={isMobile ? 3 : 4}
                       placeholder="Share a brief overview of your background, experience, and what you're looking for..."
                     />
-                    <FormHelperText>
+                    <FormHelperText sx={{ fontSize: isMobile ? '0.8rem' : '0.75rem' }}>
                       This helps us understand your background and match you with relevant opportunities
                     </FormHelperText>
                   </StyledFormControl>
@@ -359,7 +377,11 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
         </Grid>
 
         {/* Action Button */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: isMobile ? 'stretch' : 'flex-end', 
+          pt: isMobile ? 1 : 2 
+        }}>
           <StyledButton
             type="submit"
             sx={{
@@ -367,9 +389,9 @@ export function GeneralStep({ onNext, onSectionComplete }: { onNext: () => void;
               color: 'white',
             }}
             disabled={isSubmitting}
-            endIcon={<ArrowRightIcon size={20} />}
+            endIcon={!isMobile ? <ArrowRightIcon size={20} /> : null}
           >
-            Continue
+            {isMobile ? 'Continue' : 'Continue'}
           </StyledButton>
         </Box>
       </Stack>

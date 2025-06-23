@@ -35,7 +35,7 @@ export function SplitLayout({ leftContent, rightContent, children }: SplitLayout
         }}
       >
         <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '70px', py: 0, ml: 0 }}>
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flex: '1 1 auto', ml:20 }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flex: '1 1 auto', ml: { xs: 0, md: 20 } }}>
             <Box component={RouterLink} href="/" sx={{ display: 'inline-flex' }}>
               <Logo color="light" height={30} width={150} />
             </Box>
@@ -48,8 +48,8 @@ export function SplitLayout({ leftContent, rightContent, children }: SplitLayout
           display: 'flex',
           minHeight: '100vh',
           bgcolor: '#F3F4F6', // Contrast Gray
-          paddingLeft: 20,
-          paddingRight: 20,
+          paddingLeft: { xs: 2, md: 20 },
+          paddingRight: { xs: 2, md: 20 },
           paddingTop: '70px',
         }}
       >
@@ -77,9 +77,10 @@ export function SplitLayout({ leftContent, rightContent, children }: SplitLayout
             display: isHomePage ? 'block' : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            m: { xs: 0, md: 6 },
-            p: { xs: 2, md: 4 },
-            minHeight: { xs: '100vh', md: 'auto' },
+            m: { xs: 2, md: 6 },
+            p: { xs: 3, md: 4 },
+            minHeight: { xs: 'calc(100vh - 140px)', md: 'auto' },
+            maxWidth: { xs: '100%', md: '480px' },
           }}
         >
           {rightContent || children}

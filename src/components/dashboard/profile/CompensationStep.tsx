@@ -15,6 +15,7 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
+import { useTheme, useMediaQuery } from '@mui/material';
 import { 
   CurrencyDollar as MoneyIcon,
   TextT as PreferencesIcon,
@@ -73,6 +74,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
     transform: 'translateY(-2px)',
     boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
   },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1.25, 3),
+    fontSize: '0.9rem',
+    minHeight: '44px', // Better touch target
+  },
 }));
 
 const schema = zod.object({
@@ -99,6 +105,9 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
     const { user } = userContext;
     const [existingRecordId, setExistingRecordId] = React.useState<string | null>(null);
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({ defaultValues, resolver: zodResolver(schema) });
+    
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     // Check for existing user data when component mounts
     useEffect(() => {
@@ -170,26 +179,39 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={4}>
+            <Stack spacing={{ xs: 3, sm: 4 }}>
                 {/* Header */}
                 <Box>
-                    <Typography variant="h4" component="h2" gutterBottom sx={{ 
-                        fontWeight: 700, 
-                        color: 'text.primary',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2
-                    }}>
-                        <CompensationIcon size={32} weight="bold" />
+                    <Typography 
+                        variant={isMobile ? "h5" : "h4"} 
+                        component="h2" 
+                        gutterBottom 
+                        sx={{ 
+                            fontWeight: 700, 
+                            color: 'text.primary',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: { xs: 1, sm: 2 },
+                            flexWrap: 'wrap'
+                        }}
+                    >
+                        <CompensationIcon size={isMobile ? 24 : 32} weight="bold" />
                         Compensation & Preferences
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography 
+                        variant="body1" 
+                        color="text.secondary"
+                        sx={{
+                            fontSize: { xs: '0.875rem', sm: '1rem' },
+                            lineHeight: { xs: 1.5, sm: 1.6 }
+                        }}
+                    >
                         Help us understand your compensation expectations and any additional preferences for your ideal role.
                     </Typography>
                 </Box>
 
                 {/* Form Fields */}
-                <Grid container spacing={3}>
+                <Grid container spacing={{ xs: 2, sm: 3 }}>
                     <Grid item xs={12}>
                         <FieldContainer>
                             <Controller
@@ -198,10 +220,23 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
                                 render={({ field }) => (
                                     <StyledFormControl fullWidth error={Boolean(errors.compensationRange)}>
                                         <InputLabel required>What is your ideal compensation range (base + bonus)?</InputLabel>
-                                        <OutlinedInput {...field} placeholder="e.g., $120,000 - $150,000" />
-                                        <FormHelperText>We won't send you roles out of this range!</FormHelperText>
+                                        <OutlinedInput 
+                                            {...field} 
+                                            placeholder="e.g., $120,000 - $150,000"
+                                            sx={{
+                                                fontSize: { xs: '0.875rem', sm: '1rem' },
+                                                '& .MuiInputBase-input': {
+                                                    padding: { xs: '12px 14px', sm: '16px 14px' }
+                                                }
+                                            }}
+                                        />
+                                        <FormHelperText sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                                            We won't send you roles out of this range!
+                                        </FormHelperText>
                                         {errors.compensationRange ? (
-                                            <FormHelperText sx={{ fontWeight: 500 }}>{errors.compensationRange.message}</FormHelperText>
+                                            <FormHelperText sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                                                {errors.compensationRange.message}
+                                            </FormHelperText>
                                         ) : null}
                                     </StyledFormControl>
                                 )}
@@ -219,10 +254,16 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
                                         <OutlinedInput 
                                             {...field} 
                                             multiline 
-                                            rows={4} 
+                                            rows={isMobile ? 3 : 4} 
                                             placeholder="Share any specific preferences, deal-breakers, or additional context that would help us find the perfect match..."
+                                            sx={{
+                                                fontSize: { xs: '0.875rem', sm: '1rem' },
+                                                '& .MuiInputBase-input': {
+                                                    padding: { xs: '12px 14px', sm: '16px 14px' }
+                                                }
+                                            }}
                                         />
-                                        <FormHelperText>
+                                        <FormHelperText sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                                             This helps us tailor our recommendations to your specific needs and preferences
                                         </FormHelperText>
                                     </StyledFormControl>
@@ -233,11 +274,17 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
                 </Grid>
 
                 {/* Action Buttons */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2 }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    pt: { xs: 1, sm: 2 },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 2, sm: 0 }
+                }}>
                     <StyledButton 
                         onClick={onBack}
                         variant="outlined"
-                        startIcon={<ArrowLeftIcon size={20} />}
+                        startIcon={<ArrowLeftIcon size={isMobile ? 18 : 20} />}
                         sx={{
                             borderColor: '#6B7280',
                             color: '#6B7280',
@@ -245,6 +292,7 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
                                 borderColor: '#374151',
                                 backgroundColor: 'rgba(107, 114, 128, 0.04)',
                             },
+                            order: { xs: 2, sm: 1 }
                         }}
                     >
                         Back
@@ -254,9 +302,10 @@ export function CompensationStep({ onNext, onBack, onSectionComplete }: { onNext
                         sx={{
                             backgroundColor: '#3B82F6',
                             color: 'white',
+                            order: { xs: 1, sm: 2 }
                         }}
                         disabled={isSubmitting}
-                        endIcon={<ArrowRightIcon size={20} />}
+                        endIcon={<ArrowRightIcon size={isMobile ? 18 : 20} />}
                     >
                         Complete
                     </StyledButton>

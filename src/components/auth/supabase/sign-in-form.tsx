@@ -106,7 +106,7 @@ export function SignInForm(): React.JSX.Element {
   );
 
   return (
-    <Stack spacing={6} sx={{ py: 4 }}>
+    <Stack spacing={{ xs: 4, md: 6 }} sx={{ py: { xs: 2, md: 4 }, width: '100%' }}>
       <Stack spacing={2}>
         <Typography variant="h5">Sign in</Typography>
         <Typography color="text.secondary" variant="body2">
@@ -154,7 +154,7 @@ export function SignInForm(): React.JSX.Element {
           <MenuItem onClick={handleSignUpRecruiter}>I'm looking for candidates</MenuItem>
         </Menu>
       </Stack>
-      <Stack spacing={4}>
+      <Stack spacing={{ xs: 3, md: 4 }}>
         <Stack spacing={3}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={3}>
@@ -162,9 +162,16 @@ export function SignInForm(): React.JSX.Element {
                 control={control}
                 name="email"
                 render={({ field }) => (
-                  <FormControl error={Boolean(errors.email)}>
+                  <FormControl error={Boolean(errors.email)} fullWidth>
                     <InputLabel>Email address</InputLabel>
-                    <OutlinedInput {...field} type="email" sx={{ height: '56px' }} />
+                    <OutlinedInput 
+                      {...field} 
+                      type="email" 
+                      sx={{ 
+                        height: { xs: '48px', md: '56px' },
+                        fontSize: { xs: '16px', md: 'inherit' }
+                      }} 
+                    />
                     {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
                   </FormControl>
                 )}
@@ -173,11 +180,14 @@ export function SignInForm(): React.JSX.Element {
                 control={control}
                 name="password"
                 render={({ field }) => (
-                  <FormControl error={Boolean(errors.password)}>
+                  <FormControl error={Boolean(errors.password)} fullWidth>
                     <InputLabel>Password</InputLabel>
                     <OutlinedInput
                       {...field}
-                      sx={{ height: '56px' }}
+                      sx={{ 
+                        height: { xs: '48px', md: '56px' },
+                        fontSize: { xs: '16px', md: 'inherit' }
+                      }}
                       endAdornment={
                         showPassword ? (
                           <EyeIcon
@@ -207,11 +217,12 @@ export function SignInForm(): React.JSX.Element {
               <Button
                 disabled={isPending}
                 type="submit"
+                fullWidth
                 sx={{
                   backgroundColor: '#3B82F6',
                   color: '#ffffff',
-                  height: '48px',
-                  fontSize: '1rem',
+                  height: { xs: '44px', md: '48px' },
+                  fontSize: { xs: '16px', md: '1rem' },
                   '&:hover': {
                     backgroundColor: '#3B82F6',
                   },

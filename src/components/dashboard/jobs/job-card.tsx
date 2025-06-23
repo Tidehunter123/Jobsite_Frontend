@@ -176,101 +176,103 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
       }}
     >
       {/* Header Section */}
-      <Box
+      <CardContent
         sx={{
-          p: 2.5,
-          pb: 1.5,
+          p: { xs: 2, sm: 2.5 },
+          pb: { xs: 1.5, sm: 1.5 },
           background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
           borderBottom: '1px solid #e2e8f0',
         }}
       >
         {/* Top Row - Company Info & Actions */}
-        <Stack direction="row" spacing={2} alignItems="flex-start" mb={1.5}>
-          <Box
-            sx={{
-              width: 56,
-              height: 56,
-              borderRadius: '16px',
-              background: `linear-gradient(135deg, ${getIndustryColor(job.broadIndustry)}20 0%, ${getIndustryColor(job.specificIndustry)}20 100%)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '2px solid #e2e8f0',
-              position: 'relative',
-              flexShrink: 0,
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: 0,
-                borderRadius: '16px',
-                padding: '2px',
-                background: `linear-gradient(135deg, ${getIndustryColor(job.broadIndustry)}, ${getIndustryColor(job.specificIndustry)})`,
-                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                maskComposite: 'exclude',
-              },
-            }}
-          >
-            <img
-              src={job.logo && Array.isArray(job.logo) ? job.logo[0]?.url : undefined}
-              alt={job.companyName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </Box>
-
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography
-              variant="h6"
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', sm: 'flex-start' }} mb={1.5}>
+          <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ width: '100%' }}>
+            <Box
               sx={{
-                fontWeight: 700,
-                color: '#1e293b',
-                fontSize: '1.125rem',
-                lineHeight: 1.4,
-                mb: 0.5,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                width: { xs: 48, sm: 56 },
+                height: { xs: 48, sm: 56 },
+                borderRadius: '16px',
+                background: `linear-gradient(135deg, ${getIndustryColor(job.broadIndustry)}20 0%, ${getIndustryColor(job.specificIndustry)}20 100%)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid #e2e8f0',
+                position: 'relative',
+                flexShrink: 0,
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '16px',
+                  padding: '2px',
+                  background: `linear-gradient(135deg, ${getIndustryColor(job.broadIndustry)}, ${getIndustryColor(job.specificIndustry)})`,
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  maskComposite: 'exclude',
+                },
               }}
             >
-              {job.companyName}
-            </Typography>
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-              {job.experienceLevel && (
+              <img
+                src={job.logo && Array.isArray(job.logo) ? job.logo[0]?.url : undefined}
+                alt={job.companyName}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </Box>
+
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: '#1e293b',
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
+                  lineHeight: 1.4,
+                  mb: 0.5,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {job.companyName}
+              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ gap: 0.5 }}>
+                {job.experienceLevel && (
+                  <Chip
+                    label={job.experienceLevel}
+                    size="small"
+                    icon={<BriefcaseIcon size={14} />}
+                    sx={{
+                      backgroundColor: `${getIndustryColor(job.broadIndustry)}15`,
+                      color: getIndustryColor(job.broadIndustry),
+                      fontWeight: 600,
+                      fontSize: '0.75rem',
+                      height: '24px',
+                      '& .MuiChip-icon': {
+                        color: getIndustryColor(job.broadIndustry),
+                      },
+                    }}
+                  />
+                )}
                 <Chip
-                  label={job.experienceLevel}
+                  label={getTimeAgo(job.postedOn)}
                   size="small"
-                  icon={<BriefcaseIcon size={14} />}
+                  icon={<ClockIcon size={14} />}
                   sx={{
-                    backgroundColor: `${getIndustryColor(job.broadIndustry)}15`,
-                    color: getIndustryColor(job.broadIndustry),
+                    backgroundColor: '#FEF3C7',
+                    color: '#92400E',
                     fontWeight: 600,
                     fontSize: '0.75rem',
                     height: '24px',
                     '& .MuiChip-icon': {
-                      color: getIndustryColor(job.broadIndustry),
+                      color: '#92400E',
                     },
                   }}
                 />
-              )}
-              <Chip
-                label={getTimeAgo(job.postedOn)}
-                size="small"
-                icon={<ClockIcon size={14} />}
-                sx={{
-                  backgroundColor: '#FEF3C7',
-                  color: '#92400E',
-                  fontWeight: 600,
-                  fontSize: '0.75rem',
-                  height: '24px',
-                  '& .MuiChip-icon': {
-                    color: '#92400E',
-                  },
-                }}
-              />
-            </Stack>
-          </Box>
+              </Stack>
+            </Box>
+          </Stack>
 
           {/* Action Buttons */}
-          <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+          <Stack direction="row" spacing={1} sx={{ alignSelf: { xs: 'flex-end', sm: 'flex-start' } }}>
             <Button
               size="small"
               onClick={handleSaveJob}
@@ -316,7 +318,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
           sx={{
             fontWeight: 700,
             color: '#0f172a',
-            fontSize: '1.25rem',
+            fontSize: { xs: '1.125rem', sm: '1.25rem' },
             lineHeight: 1.3,
             mb: 1,
           }}
@@ -325,7 +327,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
         </Typography>
 
         {/* Function Area & Location */}
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" mb={1.5}>
+        <Stack direction={{ xs: 'row', sm: 'row' }} spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
           {job.functionArea && (
             <Chip
               label={job.functionArea}
@@ -361,13 +363,14 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
 
         {/* Quick Info Row */}
         <Stack
-          direction={isMobile ? 'column' : 'row'}
-          spacing={2}
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={{ xs: 1, sm: 2 }}
           sx={{
-            p: 2,
+            p: { xs: 1.5, sm: 2 },
             backgroundColor: 'rgba(59, 130, 246, 0.05)',
             borderRadius: '12px',
             border: '1px solid rgba(59, 130, 246, 0.1)',
+            mt: 1,
           }}
         >
           <Stack direction="row" spacing={1} alignItems="center">
@@ -384,7 +387,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
               sx={{
                 fontWeight: 600,
                 color: '#374151',
-                fontSize: '0.875rem',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
               }}
             >
               {job.broadIndustry} • {job.specificIndustry}
@@ -394,16 +397,23 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
             variant="body2"
             sx={{
               color: '#6b7280',
-              fontSize: '0.875rem',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
             }}
           >
             {job.companyRevenue} • {job.sponsorType}
           </Typography>
         </Stack>
-      </Box>
+      </CardContent>
 
       {/* Content Section */}
-      <CardContent sx={{ flexGrow: 1, p: 2.5, pt: 2, display: 'flex', flexDirection: 'column' }}>
+      <CardContent
+        sx={{
+          p: { xs: 2, sm: 3 },
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {/* Company Information */}
         <AnimatePresence>
           {isExpanded && (
@@ -427,7 +437,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
                       transition: 'all 0.3s ease',
-                      fontSize: '0.875rem',
+                      fontSize: { xs: '0.8rem', sm: '0.875rem' },
                     }}
                   >
                     {job.companyInformation}
@@ -444,7 +454,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
                         fontWeight: 600,
                         mt: 1,
                         '&:hover': {
@@ -519,8 +529,8 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
 
                 {/* Dates */}
                 <Stack
-                  direction="row"
-                  spacing={2}
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={{ xs: 1, sm: 2 }}
                   sx={{
                     pt: 1,
                     borderTop: '1px solid #f1f5f9',
@@ -532,7 +542,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
                       variant="body2"
                       sx={{
                         color: '#6b7280',
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
                       }}
                     >
                       Posted {dayjs(job.postedOn).format('MMM D, YYYY')}
@@ -544,7 +554,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
                       variant="body2"
                       sx={{
                         color: '#6b7280',
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
                       }}
                     >
                       Start {dayjs(job.idealStartDate).format('MMM D, YYYY')}
@@ -559,7 +569,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Action Section */}
-        <Box
+        <Stack
           sx={{
             mt: 2,
             pt: isExpanded ? 2 : 0,
@@ -587,8 +597,8 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
                     background: `linear-gradient(135deg, ${getIndustryColor(job.broadIndustry)} 0%, ${getIndustryColor(job.specificIndustry)} 100%)`,
                     color: 'white',
                     fontWeight: 600,
-                    fontSize: '0.875rem',
-                    padding: '12px 20px',
+                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                    padding: { xs: '10px 16px', sm: '12px 20px' },
                     borderRadius: '12px',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                     whiteSpace: 'nowrap',
@@ -603,7 +613,7 @@ export function JobCard({ job, onSave, onShare, isSaved = false }: JobCardProps)
               </motion.div>
             )}
           </AnimatePresence>
-        </Box>
+        </Stack>
       </CardContent>
     </MotionCard>
   );

@@ -15,6 +15,7 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
+import { useTheme, useMediaQuery } from '@mui/material';
 import { 
   GraduationCap as GraduationIcon,
   Building as BuildingIcon,
@@ -31,6 +32,9 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: theme.shape.borderRadius * 1.5,
     transition: 'all 0.3s ease',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '16px', // Prevents zoom on iOS
+    },
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.primary.main,
@@ -46,6 +50,9 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
   '& .MuiInputLabel-root': {
     fontWeight: 500,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '14px',
+    },
     '&.Mui-focused': {
       color: theme.palette.primary.main,
       fontWeight: 600,
@@ -68,6 +75,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
   fontSize: '1rem',
   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
   transition: 'all 0.3s ease',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1.25, 3),
+    fontSize: '0.9rem',
+    minHeight: '44px', // Better touch target
+  },
   '&:hover': {
     transform: 'translateY(-2px)',
     boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
@@ -99,6 +111,10 @@ export function EducationStep({ onNext, onBack, onSectionComplete }: { onNext: (
   }
   const { user } = userContext;
   const [existingRecordId, setExistingRecordId] = React.useState<string | null>(null);
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   
   const {
     control,
@@ -182,26 +198,39 @@ export function EducationStep({ onNext, onBack, onSectionComplete }: { onNext: (
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={4}>
+      <Stack spacing={{ xs: 3, sm: 4 }}>
         {/* Header */}
         <Box>
-          <Typography variant="h4" component="h2" gutterBottom sx={{ 
-            fontWeight: 700, 
-            color: 'text.primary',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2
-          }}>
-            <GraduationIcon size={32} weight="bold" />
+          <Typography 
+            variant={isMobile ? "h5" : "h4"} 
+            component="h2" 
+            gutterBottom 
+            sx={{ 
+              fontWeight: 700, 
+              color: 'text.primary',
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: 1, sm: 2 },
+              flexWrap: 'wrap'
+            }}
+          >
+            <GraduationIcon size={isMobile ? 24 : 32} weight="bold" />
             Education Background
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography 
+            variant="body1" 
+            color="text.secondary"
+            sx={{
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              lineHeight: { xs: 1.5, sm: 1.6 }
+            }}
+          >
             Tell us about your educational journey. This helps us understand your academic background and qualifications.
           </Typography>
         </Box>
 
         {/* Form Fields */}
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           <Grid item xs={12}>
             <FieldContainer>
               <Controller
@@ -229,7 +258,7 @@ export function EducationStep({ onNext, onBack, onSectionComplete }: { onNext: (
                   <StyledFormControl fullWidth>
                     <InputLabel>MBA (Optional)</InputLabel>
                     <OutlinedInput {...field} placeholder="Enter your MBA institution if applicable" />
-                    <FormHelperText>
+                    <FormHelperText sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                       Include your MBA program and institution if you have one
                     </FormHelperText>
                   </StyledFormControl>
@@ -247,7 +276,7 @@ export function EducationStep({ onNext, onBack, onSectionComplete }: { onNext: (
                   <StyledFormControl fullWidth>
                     <InputLabel>Grad School - Other than MBA (Optional)</InputLabel>
                     <OutlinedInput {...field} placeholder="Enter other graduate programs or institutions" />
-                    <FormHelperText>
+                    <FormHelperText sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                       Include any other graduate degrees, certifications, or advanced education
                     </FormHelperText>
                   </StyledFormControl>
@@ -258,14 +287,21 @@ export function EducationStep({ onNext, onBack, onSectionComplete }: { onNext: (
         </Grid>
 
         {/* Action Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          pt: { xs: 1, sm: 2 },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 2, sm: 0 }
+        }}>
           <StyledButton 
             onClick={onBack}
             variant="outlined"
-            startIcon={<ArrowLeftIcon size={20} />}
+            startIcon={<ArrowLeftIcon size={isMobile ? 18 : 20} />}
             sx={{
               borderColor: '#6B7280',
               color: '#6B7280',
+              order: { xs: 2, sm: 1 },
               '&:hover': {
                 borderColor: '#374151',
                 backgroundColor: 'rgba(107, 114, 128, 0.04)',
@@ -280,9 +316,10 @@ export function EducationStep({ onNext, onBack, onSectionComplete }: { onNext: (
             sx={{
               backgroundColor: '#3B82F6',
               color: 'white',
+              order: { xs: 1, sm: 2 },
             }}
             disabled={isSubmitting}
-            endIcon={<ArrowRightIcon size={20} />}
+            endIcon={<ArrowRightIcon size={isMobile ? 18 : 20} />}
           >
             Continue
           </StyledButton>

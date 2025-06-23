@@ -28,7 +28,7 @@ import { JobCard } from '@/components/dashboard/jobs/job-card';
 import type { Job } from '@/components/dashboard/jobs/job-card';
 import Airtable from 'airtable';
 
-type JobCategory = 'Internship' | 'Full-time';
+type JobCategory = 'Internship' | 'Full-time' | 'Portfolio Company Roles' | 'My Profile';
 
 interface ApiResponse {
   jobs: Job[];
@@ -115,7 +115,7 @@ function JobsFilters({ onFilterChange }: JobsFiltersProps): React.JSX.Element {
   };
 
   return (
-    <Card>
+    <Card sx={{ p: { xs: 1.5, sm: 2 } }}>
       <Input
         fullWidth
         placeholder="Enter a keyword"
@@ -126,21 +126,31 @@ function JobsFilters({ onFilterChange }: JobsFiltersProps): React.JSX.Element {
             <MagnifyingGlassIcon />
           </InputAdornment>
         }
-        sx={{ px: 3, py: 2 }}
+        sx={{ 
+          px: { xs: 2, sm: 3 }, 
+          py: { xs: 1.5, sm: 2 },
+          fontSize: { xs: '0.875rem', sm: '1rem' }
+        }}
       />
       <Divider />
       <Stack
-        direction="row"
-        spacing={2}
-        sx={{ alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between', p: 1 }}
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 1, sm: 2 }}
+        sx={{ 
+          alignItems: { xs: 'stretch', sm: 'center' }, 
+          flexWrap: 'wrap', 
+          justifyContent: 'space-between', 
+          p: { xs: 1, sm: 1 } 
+        }}
       >
-        <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2 }} sx={{ flexWrap: 'wrap', gap: 1, width: '100%' }}>
           <StyledFilterWrapper>
             <MultiSelect
               label="Remote / In person"
               options={workTypeOptions}
               value={selectedWorkTypes}
               onChange={handleWorkTypeChange}
+              sx={{ width: '100%' }}
             />
           </StyledFilterWrapper>
           <StyledFilterWrapper>
@@ -149,6 +159,7 @@ function JobsFilters({ onFilterChange }: JobsFiltersProps): React.JSX.Element {
               options={paymentTypeOptions}
               value={selectedPaymentTypes}
               onChange={handlePaymentTypeChange}
+              sx={{ width: '100%' }}
             />
           </StyledFilterWrapper>
           <StyledFilterWrapper>
@@ -157,6 +168,7 @@ function JobsFilters({ onFilterChange }: JobsFiltersProps): React.JSX.Element {
               options={jobTypeOptions}
               value={selectedJobTypes}
               onChange={handleJobTypeChange}
+              sx={{ width: '100%' }}
             />
           </StyledFilterWrapper>
         </Stack>
@@ -236,7 +248,7 @@ export function JobsList(): React.JSX.Element {
       setIsLoading(true);
       const queryParams = new URLSearchParams({
         page: page.toString(),
-        category: selectedCategory,
+        ...(selectedCategory && { category: selectedCategory }),
         ...(filters.keyword && { keyword: filters.keyword }),
         ...(filters.workTypes.length > 0 && { workTypes: filters.workTypes.join(',') }),
         ...(filters.paymentTypes.length > 0 && { paymentTypes: filters.paymentTypes.join(',') }),
@@ -341,77 +353,101 @@ export function JobsList(): React.JSX.Element {
         </Box>
 
         {/* Category Selection Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mb: 4 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: { xs: 1, sm: 2 }, 
+          justifyContent: 'center', 
+          mb: 4,
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'center'
+        }}>
           <Button
-            variant={selectedCategory === 'Internship' ? undefined : 'outlined'}
-            onClick={() => handleCategoryChange('Internship')}
+            variant={selectedCategory === 'Portfolio Company Roles' ? undefined : 'outlined'}
+            onClick={() => handleCategoryChange('Portfolio Company Roles')}
             sx={{
-              backgroundColor: selectedCategory === 'Internship' ? '#3B82F6' : 'transparent',
-              color: selectedCategory === 'Internship' ? '#fff' : '#3B82F6',
+              backgroundColor: selectedCategory === 'Portfolio Company Roles' ? '#3B82F6' : 'transparent',
+              color: selectedCategory === 'Portfolio Company Roles' ? '#fff' : '#3B82F6',
               borderColor: '#3B82F6',
-              minWidth: 200,
-              py: 2,
-              fontSize: '1.1rem',
-              fontWeight: 'bold'
+              minWidth: { xs: '100%', sm: 200 },
+              py: { xs: 1.5, sm: 2 },
+              fontSize: { xs: '1rem', sm: '1.1rem' },
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap',
             }}
           >
-            Internships
+            Portfolio Company Roles
           </Button>
           <Button
-            variant={selectedCategory === 'Full-time' ? undefined : 'outlined'}
-            onClick={() => handleCategoryChange('Full-time')}
+            variant={selectedCategory === 'My Profile' ? undefined : 'outlined'}
+            onClick={() => handleCategoryChange('My Profile')}
             sx={{
-              backgroundColor: selectedCategory === 'Full-time' ? '#3B82F6' : 'transparent',
-              color: selectedCategory === 'Full-time' ? '#fff' : '#3B82F6',
-              borderColor: selectedCategory === 'Full-time' ? '#3B82F6' : '#3B82F6',
-              minWidth: 200,
-              py: 2,
-              fontSize: '1.1rem',
-              fontWeight: 'bold'
+              backgroundColor: selectedCategory === 'My Profile' ? '#3B82F6' : 'transparent',
+              color: selectedCategory === 'My Profile' ? '#fff' : '#3B82F6',
+              borderColor: selectedCategory === 'My Profile' ? '#3B82F6' : '#3B82F6',
+              minWidth: { xs: '100%', sm: 200 },
+              py: { xs: 1.5, sm: 2 },
+              fontSize: { xs: '1rem', sm: '1.1rem' },
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap',
             }}
           >
-            Full-Time Roles
+            My Profile
           </Button>
         </Box>
 
-        <JobsFilters onFilterChange={handleFilterChange} />
-        <AnimatePresence mode="wait">
-          {isLoading ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography color="text.secondary">Loading...</Typography>
-            </Box>
-          ) : jobs.length > 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Stack spacing={2}>
-                {jobs.map((job) => (
-                  <motion.div
-                    key={job.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <JobCard job={job} />
-                  </motion.div>
-                ))}
-              </Stack>
-            </motion.div>
-          ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography color="text.secondary">No jobs found</Typography>
-            </Box>
-          )}
-        </AnimatePresence>
-        <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'center', px: 3 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <JobsFilters onFilterChange={handleFilterChange} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 9 }}>
+            <AnimatePresence mode="wait">
+              {isLoading ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography color="text.secondary">Loading...</Typography>
+                </Box>
+              ) : jobs.length > 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Stack spacing={{ xs: 1, sm: 2 }}>
+                    {jobs.map((job) => (
+                      <motion.div
+                        key={job.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <JobCard job={job} />
+                      </motion.div>
+                    ))}
+                  </Stack>
+                </motion.div>
+              ) : (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography color="text.secondary">No jobs found</Typography>
+                </Box>
+              )}
+            </AnimatePresence>
+          </Grid>
+        </Grid>
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          spacing={2} 
+          sx={{ 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            px: { xs: 1, sm: 3 },
+            gap: { xs: 1, sm: 2 }
+          }}
+        >
           <IconButton disabled={page === 1 || isLoading} onClick={handlePrevPage}>
             <CaretLeftIcon />
           </IconButton>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
             Page {page} of {totalPages}
           </Typography>
           <IconButton disabled={!hasNextPage || isLoading} onClick={handleNextPage}>

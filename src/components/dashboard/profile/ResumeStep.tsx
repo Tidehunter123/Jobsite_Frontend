@@ -20,6 +20,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import { styled } from '@mui/material/styles';
+import { useTheme, useMediaQuery } from '@mui/material';
 import { 
   FileText as ResumeIcon,
   LinkedinLogo as LinkedInIcon,
@@ -76,6 +77,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
     transform: 'translateY(-1px)',
     boxShadow: theme.shadows[4],
   },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1.25, 2.5),
+    fontSize: '0.875rem',
+    minHeight: '44px', // Better touch target for mobile
+  },
 }));
 
 const DropzoneRoot = styled('div')(({ theme }) => ({
@@ -95,6 +101,13 @@ const DropzoneRoot = styled('div')(({ theme }) => ({
   '&.has-file': {
     borderColor: theme.palette.success.main,
     backgroundColor: theme.palette.success.light + '10',
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(3),
+    minHeight: '120px', // Ensure minimum height for mobile
+  },
+  [theme.breakpoints.down('xs')]: {
+    padding: theme.spacing(2.5),
   },
 }));
 
@@ -128,6 +141,10 @@ const supabase = createClient(
 );
 
 export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () => void, onBack: () => void, onSectionComplete?: (completed: boolean) => void }): React.JSX.Element {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('xs'));
+  
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error('UserContext is not available. Make sure the component is wrapped in a UserProvider.');
@@ -371,50 +388,98 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={4}>
+      <Stack spacing={{ xs: 3, sm: 4 }}>
         {/* Header */}
         <Box>
-          <Typography variant="h4" component="h2" gutterBottom sx={{ 
-            fontWeight: 700, 
-            color: 'text.primary',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2
-          }}>
-            <ResumeIcon size={32} weight="bold" />
+          <Typography 
+            variant={isMobile ? "h5" : "h4"} 
+            component="h2" 
+            gutterBottom 
+            sx={{ 
+              fontWeight: 700, 
+              color: 'text.primary',
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: 1.5, sm: 2 },
+              flexWrap: 'wrap'
+            }}
+          >
+            <ResumeIcon size={isMobile ? 28 : 32} weight="bold" />
             Resume & LinkedIn
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography 
+            variant="body1" 
+            color="text.secondary"
+            sx={{
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              lineHeight: { xs: 1.5, sm: 1.6 }
+            }}
+          >
             Upload your resume and share your LinkedIn profile to help us understand your professional background.
           </Typography>
         </Box>
 
         {/* Form Fields */}
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           <Grid item xs={12}>
             <FieldContainer>
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
+              <Typography 
+                variant="subtitle2" 
+                gutterBottom 
+                sx={{ 
+                  fontWeight: 600, 
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }}
+              >
                 Resume Upload (PDF only)
               </Typography>
               <DropzoneRoot {...getRootProps()} className={files?.[0] || existingResume ? 'has-file' : ''}>
                 <input {...getInputProps()} />
                 {files?.[0] ? (
                   <Stack alignItems="center" spacing={1}>
-                    <PaperclipIcon size={24} weight="bold" color="#10B981" />
-                    <Typography variant="body1" sx={{ fontWeight: 500, color: 'success.main' }}>
+                    <PaperclipIcon size={isMobile ? 20 : 24} weight="bold" color="#10B981" />
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        fontWeight: 500, 
+                        color: 'success.main',
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        textAlign: 'center',
+                        wordBreak: 'break-word'
+                      }}
+                    >
                       {files[0].name}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography 
+                      variant="caption" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                    >
                       Click to replace file
                     </Typography>
                   </Stack>
                 ) : existingResume ? (
                   <Stack alignItems="center" spacing={1}>
-                    <PaperclipIcon size={24} weight="bold" color="#10B981" />
-                    <Typography variant="body1" sx={{ fontWeight: 500, color: 'success.main' }}>
+                    <PaperclipIcon size={isMobile ? 20 : 24} weight="bold" color="#10B981" />
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        fontWeight: 500, 
+                        color: 'success.main',
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        textAlign: 'center',
+                        wordBreak: 'break-word'
+                      }}
+                    >
                       {existingResume.filename}
                     </Typography>
-                    <Stack direction="row" spacing={2} alignItems="center">
+                    <Stack 
+                      direction={{ xs: 'column', sm: 'row' }} 
+                      spacing={{ xs: 1, sm: 2 }} 
+                      alignItems="center"
+                      sx={{ width: '100%' }}
+                    >
                       <Button
                         size="small"
                         variant="outlined"
@@ -424,6 +489,9 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
                           fontWeight: 600,
                           borderColor: '#10B981',
                           color: '#10B981',
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          padding: { xs: '6px 12px', sm: '8px 16px' },
+                          minHeight: { xs: '36px', sm: '40px' },
                           '&:hover': {
                             borderColor: '#059669',
                             backgroundColor: 'rgba(16, 185, 129, 0.04)',
@@ -432,30 +500,72 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
                       >
                         View Resume
                       </Button>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                      >
                         Click to replace file
                       </Typography>
                     </Stack>
                   </Stack>
                 ) : (
-                  <Stack alignItems="center" spacing={2}>
-                    <PaperclipIcon size={32} weight="light" color="#6B7280" />
-                    <Stack spacing={1}>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  <Stack alignItems="center" spacing={{ xs: 1.5, sm: 2 }}>
+                    <PaperclipIcon size={isMobile ? 28 : 32} weight="light" color="#6B7280" />
+                    <Stack spacing={1} alignItems="center">
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          fontWeight: 500,
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          textAlign: 'center'
+                        }}
+                      >
                         Drag & drop your resume here
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        or <Button component="span" sx={{ textTransform: 'none', fontWeight: 600 }}>browse files</Button>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          textAlign: 'center'
+                        }}
+                      >
+                        or <Button 
+                          component="span" 
+                          sx={{ 
+                            textTransform: 'none', 
+                            fontWeight: 600,
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            padding: { xs: '2px 4px', sm: '4px 8px' }
+                          }}
+                        >
+                          browse files
+                        </Button>
                       </Typography>
                     </Stack>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography 
+                      variant="caption" 
+                      color="text.secondary"
+                      sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                        textAlign: 'center'
+                      }}
+                    >
                       PDF format only, max 10MB
                     </Typography>
                   </Stack>
                 )}
               </DropzoneRoot>
               {validateResume(files) !== true && (
-                <FormHelperText error sx={{ fontWeight: 500, mt: 1 }}>
+                <FormHelperText 
+                  error 
+                  sx={{ 
+                    fontWeight: 500, 
+                    mt: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
+                >
                   {validateResume(files) as string}
                 </FormHelperText>
               )}
@@ -469,10 +579,31 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
                 name="linkedinUrl"
                 render={({ field }) => (
                   <StyledFormControl error={Boolean(errors.linkedinUrl)} fullWidth>
-                    <InputLabel required>LinkedIn Profile URL</InputLabel>
-                    <OutlinedInput {...field} placeholder="https://linkedin.com/in/your-profile" />
+                    <InputLabel 
+                      required
+                      sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                    >
+                      LinkedIn Profile URL
+                    </InputLabel>
+                    <OutlinedInput 
+                      {...field} 
+                      placeholder="https://linkedin.com/in/your-profile"
+                      sx={{
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        '& .MuiOutlinedInput-input': {
+                          padding: { xs: '12px 14px', sm: '16px 14px' }
+                        }
+                      }}
+                    />
                     {errors.linkedinUrl ? (
-                      <FormHelperText sx={{ fontWeight: 500 }}>{errors.linkedinUrl.message}</FormHelperText>
+                      <FormHelperText 
+                        sx={{ 
+                          fontWeight: 500,
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                        }}
+                      >
+                        {errors.linkedinUrl.message}
+                      </FormHelperText>
                     ) : null}
                   </StyledFormControl>
                 )}
@@ -483,7 +614,15 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
           <Grid item xs={12}>
             <FieldContainer>
               <FormControl component="fieldset" fullWidth>
-                <FormLabel component="legend" sx={{ fontWeight: 600, color: 'text.primary', mb: 2 }}>
+                <FormLabel 
+                  component="legend" 
+                  sx={{ 
+                    fontWeight: 600, 
+                    color: 'text.primary', 
+                    mb: 2,
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }}
+                >
                   Are you actively looking for a new role?
                 </FormLabel>
                 <Controller
@@ -494,19 +633,46 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
                       <FormControlLabel 
                         value="Actively looking" 
                         control={<Radio />} 
-                        label="Actively looking" 
-                        sx={{ mb: 1 }}
+                        label={
+                          <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                            Actively looking
+                          </Typography>
+                        }
+                        sx={{ 
+                          mb: 1,
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: { xs: '0.875rem', sm: '1rem' }
+                          }
+                        }}
                       />
                       <FormControlLabel 
                         value="Open to the right opportunity" 
                         control={<Radio />} 
-                        label="Open to the right opportunity" 
-                        sx={{ mb: 1 }}
+                        label={
+                          <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                            Open to the right opportunity
+                          </Typography>
+                        }
+                        sx={{ 
+                          mb: 1,
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: { xs: '0.875rem', sm: '1rem' }
+                          }
+                        }}
                       />
                       <FormControlLabel 
                         value="Not currently looking" 
                         control={<Radio />} 
-                        label="Not currently looking" 
+                        label={
+                          <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                            Not currently looking
+                          </Typography>
+                        }
+                        sx={{
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: { xs: '0.875rem', sm: '1rem' }
+                          }
+                        }}
                       />
                     </RadioGroup>
                   )}
@@ -517,14 +683,21 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
         </Grid>
 
         {/* Action Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          pt: 2,
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 2, sm: 0 }
+        }}>
           <StyledButton 
             onClick={onBack}
             variant="outlined"
-            startIcon={<ArrowLeftIcon size={20} />}
+            startIcon={<ArrowLeftIcon size={isMobile ? 18 : 20} />}
             sx={{
               borderColor: '#6B7280',
               color: '#6B7280',
+              width: { xs: '100%', sm: 'auto' },
               '&:hover': {
                 borderColor: '#374151',
                 backgroundColor: 'rgba(107, 114, 128, 0.04)',
@@ -539,9 +712,10 @@ export function ResumeStep({ onNext, onBack, onSectionComplete }: { onNext: () =
             sx={{
               backgroundColor: '#3B82F6',
               color: 'white',
+              width: { xs: '100%', sm: 'auto' },
             }}
             disabled={isSubmitting}
-            endIcon={<ArrowRightIcon size={20} />}
+            endIcon={<ArrowRightIcon size={isMobile ? 18 : 20} />}
           >
             Continue
           </StyledButton>

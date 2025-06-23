@@ -21,6 +21,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import { styled } from '@mui/material/styles';
+import { useTheme, useMediaQuery } from '@mui/material';
 import { 
   Briefcase as JobIcon,
   Buildings as IndustryIcon,
@@ -77,6 +78,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
     transform: 'translateY(-1px)',
     boxShadow: theme.shadows[4],
   },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1.25, 2.5),
+    fontSize: '0.9rem',
+    minHeight: '44px', // Better touch target
+  },
 }));
 
 const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
@@ -86,6 +92,12 @@ const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
   '&:hover': {
     backgroundColor: theme.palette.primary.light + '20',
   },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(0.75),
+    '& .MuiSvgIcon-root': {
+      fontSize: '1.25rem',
+    },
+  },
 }));
 
 const StyledRadio = styled(Radio)(({ theme }) => ({
@@ -94,6 +106,12 @@ const StyledRadio = styled(Radio)(({ theme }) => ({
   },
   '&:hover': {
     backgroundColor: theme.palette.primary.light + '20',
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(0.75),
+    '& .MuiSvgIcon-root': {
+      fontSize: '1.25rem',
+    },
   },
 }));
 
@@ -154,6 +172,10 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
     const { user } = userContext;
     const [existingRecordId, setExistingRecordId] = React.useState<string | null>(null);
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({ defaultValues, resolver: zodResolver(schema) });
+    
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
     // Check for existing user data when component mounts
     useEffect(() => {
@@ -237,41 +259,59 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={4}>
+            <Stack spacing={isMobile ? 3 : 4}>
                 {/* Header */}
                 <Box>
-                    <Typography variant="h4" component="h2" gutterBottom sx={{ 
-                        fontWeight: 700, 
-                        color: 'text.primary',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2
-                    }}>
-                        <JobIcon size={32} weight="bold" />
+                    <Typography 
+                        variant={isMobile ? "h5" : "h4"} 
+                        component="h2" 
+                        gutterBottom 
+                        sx={{ 
+                            fontWeight: 700, 
+                            color: 'text.primary',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: isMobile ? 1 : 2,
+                            flexWrap: 'wrap'
+                        }}
+                    >
+                        <JobIcon size={isMobile ? 24 : 32} weight="bold" />
                         Job Preferences
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography 
+                        variant="body1" 
+                        color="text.secondary"
+                        sx={{
+                            fontSize: isMobile ? '0.9rem' : '1rem',
+                            lineHeight: isMobile ? 1.5 : 1.6
+                        }}
+                    >
                         Tell us about your ideal role and the types of companies you'd like to work with.
                     </Typography>
                 </Box>
 
                 {/* Form Fields */}
-                <Grid container spacing={4}>
+                <Grid container spacing={isMobile ? 2 : 4}>
                     <Grid item xs={12}>
                         <FieldContainer>
-                            <Typography variant="subtitle1" sx={{ 
-                                fontWeight: 600, 
-                                color: 'text.primary', 
-                                mb: 2,
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 1 
-                            }}>
-                                <IndustryIcon size={20} />
+                            <Typography 
+                                variant={isMobile ? "body1" : "subtitle1"} 
+                                sx={{ 
+                                    fontWeight: 600, 
+                                    color: 'text.primary', 
+                                    mb: isMobile ? 1.5 : 2,
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: 1,
+                                    flexWrap: 'wrap',
+                                    fontSize: isMobile ? '0.95rem' : '1rem'
+                                }}
+                            >
+                                <IndustryIcon size={isMobile ? 16 : 20} />
                                 What industries are you most interested in operating in?
                             </Typography>
                             <FormGroup>
-                                <Grid container spacing={2}>
+                                <Grid container spacing={isMobile ? 1 : 2}>
                                     {industries.map((industry) => (
                                         <Grid item key={industry} xs={12} sm={6} md={4}>
                                             <Controller
@@ -293,9 +333,11 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                                         label={industry}
                                                         sx={{ 
                                                             '& .MuiFormControlLabel-label': { 
-                                                                fontSize: '0.9rem',
-                                                                fontWeight: 500
-                                                            } 
+                                                                fontSize: isMobile ? '0.85rem' : '0.9rem',
+                                                                fontWeight: 500,
+                                                                lineHeight: isMobile ? 1.3 : 1.4
+                                                            },
+                                                            margin: isMobile ? '4px 0' : '8px 0'
                                                         }}
                                                     />
                                                 )}
@@ -314,9 +356,18 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                 name="specificIndustries"
                                 render={({ field }) => (
                                     <StyledFormControl fullWidth>
-                                        <InputLabel>Use this space to specify specific industries...</InputLabel>
-                                        <OutlinedInput {...field} multiline rows={3} />
-                                        <FormHelperText>
+                                        <InputLabel sx={{ fontSize: isMobile ? '0.9rem' : '1rem' }}>
+                                            Use this space to specify specific industries...
+                                        </InputLabel>
+                                        <OutlinedInput 
+                                            {...field} 
+                                            multiline 
+                                            rows={isMobile ? 2 : 3}
+                                            sx={{
+                                                fontSize: isMobile ? '0.9rem' : '1rem'
+                                            }}
+                                        />
+                                        <FormHelperText sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}>
                                             Add any specific industries or sectors not listed above
                                         </FormHelperText>
                                     </StyledFormControl>
@@ -327,19 +378,24 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
 
                     <Grid item xs={12}>
                         <FieldContainer>
-                            <Typography variant="subtitle1" sx={{ 
-                                fontWeight: 600, 
-                                color: 'text.primary', 
-                                mb: 2,
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 1 
-                            }}>
-                                <RoleIcon size={20} />
+                            <Typography 
+                                variant={isMobile ? "body1" : "subtitle1"} 
+                                sx={{ 
+                                    fontWeight: 600, 
+                                    color: 'text.primary', 
+                                    mb: isMobile ? 1.5 : 2,
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: 1,
+                                    flexWrap: 'wrap',
+                                    fontSize: isMobile ? '0.95rem' : '1rem'
+                                }}
+                            >
+                                <RoleIcon size={isMobile ? 16 : 20} />
                                 What type of role are you most interested in?
                             </Typography>
                             <FormGroup>
-                                <Grid container spacing={2}>
+                                <Grid container spacing={isMobile ? 1 : 2}>
                                     {roles.map((role) => (
                                         <Grid item key={role} xs={12} sm={6}>
                                             <Controller
@@ -361,9 +417,11 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                                         label={role}
                                                         sx={{ 
                                                             '& .MuiFormControlLabel-label': { 
-                                                                fontSize: '0.9rem',
-                                                                fontWeight: 500
-                                                            } 
+                                                                fontSize: isMobile ? '0.85rem' : '0.9rem',
+                                                                fontWeight: 500,
+                                                                lineHeight: isMobile ? 1.3 : 1.4
+                                                            },
+                                                            margin: isMobile ? '4px 0' : '8px 0'
                                                         }}
                                                     />
                                                 )}
@@ -377,15 +435,20 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
 
                     <Grid item xs={12}>
                         <FieldContainer>
-                            <Typography variant="subtitle1" sx={{ 
-                                fontWeight: 600, 
-                                color: 'text.primary', 
-                                mb: 2,
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 1 
-                            }}>
-                                <PnlIcon size={20} />
+                            <Typography 
+                                variant={isMobile ? "body1" : "subtitle1"} 
+                                sx={{ 
+                                    fontWeight: 600, 
+                                    color: 'text.primary', 
+                                    mb: isMobile ? 1.5 : 2,
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: 1,
+                                    flexWrap: 'wrap',
+                                    fontSize: isMobile ? '0.95rem' : '1rem'
+                                }}
+                            >
+                                <PnlIcon size={isMobile ? 16 : 20} />
                                 Have you had full P&L responsibility in a prior role?
                             </Typography>
                             <Controller
@@ -400,10 +463,11 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                                 control={<StyledRadio />} 
                                                 label={resp}
                                                 sx={{ 
-                                                    mb: 1,
+                                                    mb: isMobile ? 0.5 : 1,
                                                     '& .MuiFormControlLabel-label': { 
-                                                        fontSize: '0.9rem',
-                                                        fontWeight: 500
+                                                        fontSize: isMobile ? '0.85rem' : '0.9rem',
+                                                        fontWeight: 500,
+                                                        lineHeight: isMobile ? 1.3 : 1.4
                                                     } 
                                                 }}
                                             />
@@ -421,9 +485,18 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                 name="pnlDescription"
                                 render={({ field }) => (
                                     <StyledFormControl fullWidth>
-                                        <InputLabel>Please describe the size and scope of that responsibility...</InputLabel>
-                                        <OutlinedInput {...field} multiline rows={3} />
-                                        <FormHelperText>
+                                        <InputLabel sx={{ fontSize: isMobile ? '0.9rem' : '1rem' }}>
+                                            Please describe the size and scope of that responsibility...
+                                        </InputLabel>
+                                        <OutlinedInput 
+                                            {...field} 
+                                            multiline 
+                                            rows={isMobile ? 2 : 3}
+                                            sx={{
+                                                fontSize: isMobile ? '0.9rem' : '1rem'
+                                            }}
+                                        />
+                                        <FormHelperText sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}>
                                             Include details about budget size, team size, and business impact
                                         </FormHelperText>
                                     </StyledFormControl>
@@ -434,15 +507,20 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
 
                     <Grid item xs={12}>
                         <FieldContainer>
-                            <Typography variant="subtitle1" sx={{ 
-                                fontWeight: 600, 
-                                color: 'text.primary', 
-                                mb: 2,
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 1 
-                            }}>
-                                <CompanyIcon size={20} />
+                            <Typography 
+                                variant={isMobile ? "body1" : "subtitle1"} 
+                                sx={{ 
+                                    fontWeight: 600, 
+                                    color: 'text.primary', 
+                                    mb: isMobile ? 1.5 : 2,
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: 1,
+                                    flexWrap: 'wrap',
+                                    fontSize: isMobile ? '0.95rem' : '1rem'
+                                }}
+                            >
+                                <CompanyIcon size={isMobile ? 16 : 20} />
                                 What size company are you best suited to lead?
                             </Typography>
                             <Controller
@@ -457,10 +535,11 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                                 control={<StyledRadio />} 
                                                 label={size}
                                                 sx={{ 
-                                                    mb: 1,
+                                                    mb: isMobile ? 0.5 : 1,
                                                     '& .MuiFormControlLabel-label': { 
-                                                        fontSize: '0.9rem',
-                                                        fontWeight: 500
+                                                        fontSize: isMobile ? '0.85rem' : '0.9rem',
+                                                        fontWeight: 500,
+                                                        lineHeight: isMobile ? 1.3 : 1.4
                                                     } 
                                                 }}
                                             />
@@ -473,11 +552,17 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                 </Grid>
 
                 {/* Action Buttons */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2 }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    pt: isMobile ? 1 : 2,
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: isMobile ? 2 : 0
+                }}>
                     <StyledButton 
                         onClick={onBack}
                         variant="outlined"
-                        startIcon={<ArrowLeftIcon size={20} />}
+                        startIcon={<ArrowLeftIcon size={isMobile ? 16 : 20} />}
                         sx={{
                             borderColor: '#6B7280',
                             color: '#6B7280',
@@ -485,6 +570,7 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                                 borderColor: '#374151',
                                 backgroundColor: 'rgba(107, 114, 128, 0.04)',
                             },
+                            width: isMobile ? '100%' : 'auto',
                         }}
                     >
                         Back
@@ -495,9 +581,10 @@ export function JobPreferencesStep({ onNext, onBack, onSectionComplete }: { onNe
                         sx={{
                             backgroundColor: '#3B82F6',
                             color: 'white',
+                            width: isMobile ? '100%' : 'auto',
                         }}
                         disabled={isSubmitting}
-                        endIcon={<ArrowRightIcon size={20} />}
+                        endIcon={<ArrowRightIcon size={isMobile ? 16 : 20} />}
                     >
                         Continue
                     </StyledButton>

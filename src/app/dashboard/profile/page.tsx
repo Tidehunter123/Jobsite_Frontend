@@ -316,7 +316,7 @@ export default function ProfilePage(): React.JSX.Element {
   }
 
   return (
-    <Box sx={{ p: 4, backgroundColor: 'grey.50', minHeight: '100vh', maxWidth: '80%', alignItems: 'center', margin: 'auto' }}>
+    <Box sx={{ p: 4, backgroundColor: 'grey.50', minHeight: '100vh', maxWidth: { xs: '95%', md: '80%' }, alignItems: 'center', margin: 'auto' }}>
       <Grid container spacing={4}>
         {/* Header Section */}
         <Grid item xs={12}>

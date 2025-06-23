@@ -51,12 +51,12 @@ export function MobileNav({ items = [], open, onClose }: MobileNavProps): React.
           '--Workspaces-title-color': 'var(--mui-palette-neutral-400)',
           '--Workspaces-name-color': 'var(--mui-palette-neutral-300)',
           '--Workspaces-expand-color': 'var(--mui-palette-neutral-400)',
-          bgcolor: '#E3E3E3',
-          color: '#000000',
+          bgcolor: '#E6F0FA',
+          color: '#0A2540',
           display: 'flex',
           flexDirection: 'column',
           maxWidth: '100%',
-          width: 'var(--MobileNav-width)',
+          width: { xs: '280px', sm: '320px' },
           zIndex: 'var(--MobileNav-zIndex)',
           scrollbarWidth: 'none',
           '&::-webkit-scrollbar': { display: 'none' },
@@ -64,15 +64,16 @@ export function MobileNav({ items = [], open, onClose }: MobileNavProps): React.
       }}
       onClose={onClose}
       open={open}
+      anchor="right"
     >
-      <Stack spacing={2} sx={{ p: 2 }}>
-        <div>
+      <Stack spacing={2} sx={{ p: { xs: 2, sm: 3 } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-            <Logo color="light" height={50} width={50} />
+            <Logo color="light" height={30} width={120} />
           </Box>
-        </div>
+        </Box>
       </Stack>
-      <Box component="nav" sx={{ flex: '1 1 auto', p: 2 }}>
+      <Box component="nav" sx={{ flex: '1 1 auto', p: { xs: 2, sm: 3 } }}>
         {renderNavGroups({ items, onClose, pathname })}
       </Box>
     </Drawer>

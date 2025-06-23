@@ -55,20 +55,27 @@ export function MainNav({ items }: MainNavProps): React.JSX.Element {
           sx={{
             display: 'flex',
             minHeight: 'var(--MainNav-height)',
-            py: '10px',
+            py: { xs: '8px', sm: '10px' },
             ml: 0,
             width: '100%',
             maxWidth: '100% !important',
-            paddingLeft: '20px',
-            paddingRight: '20px',
+            paddingLeft: { xs: '16px', sm: '20px' },
+            paddingRight: { xs: '16px', sm: '20px' },
           }}
         >
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flex: 1, ml: 20 }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flex: 1, ml: { xs: 0, sm: 20 } }}>
             <Box component={RouterLink} href="/" sx={{ display: 'inline-flex' }}>
-              <Logo color="light" height={30} width={150} />
+              <Logo color="light" height={isMobile ? 25 : 30} width={isMobile ? 120 : 150} />
             </Box>
             {pathname !== '/onboarding/recruiter' && !pathname?.includes('/dashboard') && pathname !== '/' && (
-              <Stack direction="row" spacing={4} sx={{ ml: 6 }}>
+              <Stack 
+                direction="row" 
+                spacing={{ xs: 2, sm: 4 }} 
+                sx={{ 
+                  ml: { xs: 2, sm: 6 },
+                  display: { xs: 'none', md: 'flex' }
+                }}
+              >
                 {items[0]?.items?.map((item) => (
                   <Box key={item.title} sx={{ position: 'relative', display: 'inline-block' }}>
                     <RouterLink
@@ -76,10 +83,10 @@ export function MainNav({ items }: MainNavProps): React.JSX.Element {
                       style={{
                         color: '#0A2540',
                         fontWeight: 600,
-                        fontSize: '16px',
+                        fontSize: isMobile ? '14px' : '16px',
                         textDecoration: pathname === item.href ? 'underline' : 'none',
                         position: 'relative',
-                        padding: '8px 16px',
+                        padding: isMobile ? '6px 12px' : '8px 16px',
                         transition: 'color 0.2s',
                         display: 'inline-block',
                       }}
@@ -93,11 +100,11 @@ export function MainNav({ items }: MainNavProps): React.JSX.Element {
           </Stack>
           <Stack
             direction="row"
-            spacing={2}
+            spacing={{ xs: 1, sm: 2 }}
             sx={{
               alignItems: 'center',
               justifyContent: 'flex-end',
-              mr: 5,
+              mr: { xs: 2, sm: 5 },
             }}
           >
             {pathname !== '/' && (
@@ -110,9 +117,24 @@ export function MainNav({ items }: MainNavProps): React.JSX.Element {
                 <UserButton />
               </>
             )}
+            {/* Mobile Menu Button */}
+            {isMobile && pathname !== '/onboarding/recruiter' && !pathname?.includes('/dashboard') && pathname !== '/' && (
+              <IconButton
+                onClick={() => setOpenNav(true)}
+                sx={{
+                  color: '#0A2540',
+                  display: { xs: 'flex', md: 'none' },
+                  ml: 1
+                }}
+              >
+                <ListIcon />
+              </IconButton>
+            )}
           </Stack>
         </Container>
       </Box>
+      {/* Mobile Navigation Drawer */}
+      <MobileNav items={items} onClose={() => setOpenNav(false)} open={openNav} />
     </React.Fragment>
   );
 }

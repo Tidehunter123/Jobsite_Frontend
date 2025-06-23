@@ -361,8 +361,8 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
     roleTypes.length > 0;
 
   return (
-    <Card sx={{ p: 2 }}>
-      <Stack spacing={2}>
+    <Card sx={{ p: { xs: 1.5, sm: 2 } }}>
+      <Stack spacing={{ xs: 1.5, sm: 2 }}>
         {/* Active Filters Display */}
         {hasActiveFilters && (
           <Box sx={{ mb: 2 }}>
@@ -377,19 +377,32 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       Job Title:
                     </Typography>
-                    <Typography variant="body2">{jobTitle}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {jobTitle}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearJobTitle} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearJobTitle} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
@@ -401,19 +414,32 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       Experience:
                     </Typography>
-                    <Typography variant="body2">{experienceLevels.join(', ')}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {experienceLevels.join(', ')}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearExperienceLevels} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearExperienceLevels} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
@@ -425,63 +451,36 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       Function:
                     </Typography>
-                    <Typography variant="body2">{functionAreas.join(', ')}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {functionAreas.join(', ')}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearFunctionAreas} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearFunctionAreas} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
               )}
-              {/* {broadIndustries.length > 0 && (
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  gap: 1,
-                  p: 1, 
-                  bgcolor: '#F3F4F6', 
-                  borderRadius: 1,
-                  fontSize: '0.875rem'
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Broad Industry:</Typography>
-                    <Typography variant="body2">{broadIndustries.join(', ')}</Typography>
-                  </Box>
-                  <IconButton onClick={handleClearBroadIndustries} size="small" sx={{ p: 0 }}>
-                    <XIcon size={16} />
-                  </IconButton>
-                </Box>
-              )} */}
-              {/* {specificIndustries.length > 0 && (
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  gap: 1,
-                  p: 1, 
-                  bgcolor: '#F3F4F6', 
-                  borderRadius: 1,
-                  fontSize: '0.875rem'
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Specific Industry:</Typography>
-                    <Typography variant="body2">{specificIndustries.join(', ')}</Typography>
-                  </Box>
-                  <IconButton onClick={handleClearSpecificIndustries} size="small" sx={{ p: 0 }}>
-                    <XIcon size={16} />
-                  </IconButton>
-                </Box>
-              )} */}
               {companyRevenues.length > 0 && (
                 <Box
                   sx={{
@@ -489,19 +488,32 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       Revenue:
                     </Typography>
-                    <Typography variant="body2">{companyRevenues.join(', ')}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {companyRevenues.join(', ')}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearCompanyRevenues} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearCompanyRevenues} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
@@ -513,19 +525,32 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       Region:
                     </Typography>
-                    <Typography variant="body2">{regions.join(', ')}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {regions.join(', ')}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearRegions} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearRegions} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
@@ -537,19 +562,32 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       City:
                     </Typography>
-                    <Typography variant="body2">{cities.join(', ')}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {cities.join(', ')}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearCities} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearCities} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
@@ -561,19 +599,32 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 1,
-                    p: 1,
+                    p: { xs: 0.75, sm: 1 },
                     bgcolor: '#F3F4F6',
                     borderRadius: 1,
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
                       Role Type:
                     </Typography>
-                    <Typography variant="body2">{roleTypes.join(', ')}</Typography>
+                    <Typography variant="body2" sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {roleTypes.join(', ')}
+                    </Typography>
                   </Box>
-                  <IconButton onClick={handleClearRoleTypes} size="small" sx={{ p: 0 }}>
+                  <IconButton onClick={handleClearRoleTypes} size="small" sx={{ p: 0, flexShrink: 0 }}>
                     <XIcon size={16} />
                   </IconButton>
                 </Box>
@@ -586,9 +637,10 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                 backgroundColor: '#EF4444',
                 color: 'white',
                 '&:hover': { backgroundColor: '#DC2626' },
-                fontSize: '0.875rem',
-                py: 0.5,
-                px: 2,
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                py: { xs: 0.5, sm: 0.5 },
+                px: { xs: 1.5, sm: 2 },
+                width: { xs: '100%', sm: 'auto' }
               }}
             >
               Clear All Filters
@@ -597,7 +649,7 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
         )}
 
         <Stack spacing={1}>
-          <Typography variant="subtitle2">Job Title</Typography>
+          <Typography variant="subtitle2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Job Title</Typography>
           <Input
             fullWidth
             placeholder="Search by title."
@@ -613,11 +665,12 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
                 <MagnifyingGlassIcon />
               </InputAdornment>
             }
+            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
           />
         </Stack>
         <Divider />
         <Stack spacing={1}>
-          <Typography variant="subtitle2">Experience Level</Typography>
+          <Typography variant="subtitle2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Experience Level</Typography>
           <MultiSelect
             label="All levels"
             options={experienceLevelOptions}
@@ -628,7 +681,7 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
         </Stack>
         <Divider />
         <Stack spacing={1}>
-          <Typography variant="subtitle2">Function Area</Typography>
+          <Typography variant="subtitle2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Function Area</Typography>
           <MultiSelect
             label="All areas"
             options={functionAreaOptions}
@@ -638,30 +691,8 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
           />
         </Stack>
         <Divider />
-        {/* <Stack spacing={1}>
-          <Typography variant="subtitle2">Broad Industry</Typography>
-          <MultiSelect
-            label="All industries"
-            options={broadIndustryOptions}
-            value={broadIndustries}
-            onChange={handleBroadIndustriesChange}
-            sx={{ backgroundColor: '#F3F4F6', width: '100%' }}
-          />
-        </Stack>
-        <Divider />
         <Stack spacing={1}>
-          <Typography variant="subtitle2">Specific Industry</Typography>
-          <MultiSelect
-            label="All industries"
-            options={specificIndustryOptions}
-            value={specificIndustries}
-            onChange={handleSpecificIndustriesChange}
-            sx={{ backgroundColor: '#F3F4F6', width: '100%' }}
-          />
-        </Stack>
-        <Divider /> */}
-        <Stack spacing={1}>
-          <Typography variant="subtitle2">Company Revenue</Typography>
+          <Typography variant="subtitle2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Company Revenue</Typography>
           <MultiSelect
             label="All revenues"
             options={companyRevenueOptions}
@@ -672,7 +703,7 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
         </Stack>
         <Divider />
         <Stack spacing={1}>
-          <Typography variant="subtitle2">Region</Typography>
+          <Typography variant="subtitle2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Region</Typography>
           <MultiSelect
             label="All regions"
             options={regionOptions}
@@ -682,13 +713,8 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
           />
         </Stack>
         <Divider />
-        {/* <Stack spacing={1}>
-          <Typography variant="subtitle2">City</Typography>
-          <MultiSelect label="All cities" options={cityOptions} value={cities} onChange={handleCitiesChange} sx={{ backgroundColor: '#F3F4F6', width: '100%' }}/>
-        </Stack>
-        <Divider /> */}
         <Stack spacing={1}>
-          <Typography variant="subtitle2">Role Type</Typography>
+          <Typography variant="subtitle2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Role Type</Typography>
           <MultiSelect
             label="All types"
             options={roleTypeOptions}
@@ -699,7 +725,13 @@ function JobsFilters({ onFilterChange, currentFilters }: JobsFiltersProps): Reac
         </Stack>
         <Button
           onClick={handleFilter}
-          sx={{ backgroundColor: '#3B82F6', color: 'white', '&:hover': { backgroundColor: '#3B82F6' } }}
+          sx={{ 
+            backgroundColor: '#3B82F6', 
+            color: 'white', 
+            '&:hover': { backgroundColor: '#3B82F6' },
+            py: { xs: 1, sm: 1.5 },
+            fontSize: { xs: '0.875rem', sm: '1rem' }
+          }}
         >
           Search Jobs
         </Button>
@@ -896,7 +928,14 @@ export function JobsList(): React.JSX.Element {
         </Box>
 
         {/* Category Selection Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mb: 4 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: { xs: 2, sm: 2 }, 
+          justifyContent: 'center', 
+          mb: 4,
+          flexDirection: { xs: 'row', sm: 'row' },
+          alignItems: 'center'
+        }}>
           <Button
             variant={selectedCategory === 'Portfolio Company Roles' ? undefined : 'outlined'}
             onClick={() => handleCategoryChange('Portfolio Company Roles')}
@@ -904,10 +943,11 @@ export function JobsList(): React.JSX.Element {
               backgroundColor: selectedCategory === 'Portfolio Company Roles' ? '#3B82F6' : 'transparent',
               color: selectedCategory === 'Portfolio Company Roles' ? '#fff' : '#3B82F6',
               borderColor: '#3B82F6',
-              minWidth: 200,
-              py: 2,
-              fontSize: '1.1rem',
+              minWidth: { xs: '30%', sm: 200 },
+              py: { xs: 1.5, sm: 2 },
+              fontSize: { xs: '1rem', sm: '1.1rem' },
               fontWeight: 'bold',
+              whiteSpace: 'nowrap',
             }}
           >
             Portfolio Company Roles
@@ -919,21 +959,22 @@ export function JobsList(): React.JSX.Element {
               backgroundColor: selectedCategory === 'My Profile' ? '#3B82F6' : 'transparent',
               color: selectedCategory === 'My Profile' ? '#fff' : '#3B82F6',
               borderColor: selectedCategory === 'My Profile' ? '#3B82F6' : '#3B82F6',
-              minWidth: 200,
-              py: 2,
-              fontSize: '1.1rem',
+              minWidth: { xs: '30%', sm: 200 },
+              py: { xs: 1.5, sm: 2 },
+              fontSize: { xs: '1rem', sm: '1.1rem' },
               fontWeight: 'bold',
+              whiteSpace: 'nowrap',
             }}
           >
             My Profile
           </Button>
         </Box>
 
-        <Grid container spacing={3}>
-          <Grid size={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <JobsFilters onFilterChange={handleFilterChange} currentFilters={filters} />
           </Grid>
-          <Grid size={9}>
+          <Grid size={{ xs: 12, md: 9 }}>
             <AnimatePresence mode="wait">
               {isLoading ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -946,7 +987,7 @@ export function JobsList(): React.JSX.Element {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Stack spacing={2}>
+                  <Stack spacing={{ xs: 1, sm: 2 }}>
                     {jobs.map((job) => (
                       <motion.div
                         key={job.id}
@@ -968,11 +1009,20 @@ export function JobsList(): React.JSX.Element {
             </AnimatePresence>
           </Grid>
         </Grid>
-        <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'center', px: 3 }}>
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          spacing={2} 
+          sx={{ 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            px: { xs: 1, sm: 3 },
+            gap: { xs: 1, sm: 2 }
+          }}
+        >
           <IconButton disabled={page === 1 || isLoading} onClick={handlePrevPage}>
             <CaretLeftIcon />
           </IconButton>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
             Page {page} of {totalPages}
           </Typography>
           <IconButton disabled={!hasNextPage || isLoading} onClick={handleNextPage}>
